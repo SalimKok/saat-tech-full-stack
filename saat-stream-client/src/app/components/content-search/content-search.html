@@ -1,0 +1,240 @@
+<section class="hero-section">
+  <h1 class="hero-title">Discover Movies & TV Series</h1>
+  <p class="hero-subtitle">Search by title, plot synopsis, cast members, or with typo tolerance.</p>
+
+  <div class="search-box-wrapper">
+    <span class="search-icon">🔍</span>
+    <input 
+      type="text" 
+      class="search-input" 
+      placeholder="Search by title, synopsis, or cast..." 
+      [(ngModel)]="filter.query"
+      (input)="onSearchInput()"
+      (keyup.enter)="onSearchSubmit()"
+    />
+    <div class="search-actions">
+      <button *ngIf="filter.query" type="button" class="clear-btn" (click)="clearFilters()">✕</button>
+      <button type="button" class="search-btn" (click)="onSearchSubmit()">Search</button>
+    </div>
+  </div>
+
+  
+  <div class="tuning-toggle-wrapper">
+    <button type="button" class="tune-toggle-btn" (click)="showBoostSettings = !showBoostSettings">
+      ⚙️ Search Field Weights (Boost Tuning) 
+      <span class="toggle-arrow">{{ showBoostSettings ? '▲' : '▼' }}</span>
+    </button>
+  </div>
+
+
+  <div class="boost-panel" *ngIf="showBoostSettings">
+    <div class="boost-header">
+      <h4>🎯 Dynamic Field Relevance Multipliers (BM25 Boosts)</h4>
+      <button type="button" class="reset-boost-btn" (click)="resetBoosts()">Reset to Default</button>
+    </div>
+    <div class="sliders-grid">
+      <div class="slider-item">
+        <div class="slider-label">
+          <span>Title Weight:</span>
+          <strong>{{ filter.titleBoost }}x</strong>
+        </div>
+        <input type="range" min="0.1" max="10" step="0.1" [(ngModel)]="filter.titleBoost" (change)="onBoostChange()" />
+      </div>
+
+      <div class="slider-item">
+        <div class="slider-label">
+          <span>Plot / Synopsis:</span>
+          <strong>{{ filter.plotBoost }}x</strong>
+        </div>
+        <input type="range" min="0.1" max="10" step="0.1" [(ngModel)]="filter.plotBoost" (change)="onBoostChange()" />
+      </div>
+
+      <div class="slider-item">
+        <div class="slider-label">
+          <span>Cast / Actors:</span>
+          <strong>{{ filter.castBoost }}x</strong>
+        </div>
+        <input type="range" min="0.1" max="10" step="0.1" [(ngModel)]="filter.castBoost" (change)="onBoostChange()" />
+      </div>
+
+      <div class="slider-item">
+        <div class="slider-label">
+          <span>Genre:</span>
+          <strong>{{ filter.genreBoost }}x</strong>
+        </div>
+        <input type="range" min="0.1" max="10" step="0.1" [(ngModel)]="filter.genreBoost" (change)="onBoostChange()" />
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="filters-row">
+    <div class="filter-group">
+      <span class="filter-label">Type:</span>
+      <button type="button" class="pill-btn" [class.active]="filter.contentType === ''" (click)="onContentTypeChange('')">All</button>
+      <button type="button" class="pill-btn" [class.active]="filter.contentType === 'MOVIE'" (click)="onContentTypeChange('MOVIE')">🎬 Movie</button>
+      <button type="button" class="pill-btn" [class.active]="filter.contentType === 'SERIES'" (click)="onContentTypeChange('SERIES')">📺 Series</button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Genre:</span>
+      <button 
+        type="button"
+        *ngFor="let g of genres" 
+        class="pill-btn" 
+        [class.active]="(g === 'All' && !filter.genre) || filter.genre === g"
+        (click)="onGenreChange(g)">
+        {{ g }}
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Rating:</span>
+      <button type="button" class="pill-btn" [class.active]="filter.minRating === undefined" (click)="onRatingChange(undefined)">All</button>
+      <button type="button" class="pill-btn" [class.active]="filter.minRating === 8.0" (click)="onRatingChange(8.0)">⭐ 8.0+</button>
+      <button type="button" class="pill-btn" [class.active]="filter.minRating === 8.5" (click)="onRatingChange(8.5)">🔥 8.5+</button>
+    </div>
+  </div>
+</section>
+
+
+<div class="results-bar">
+  <span class="results-count">
+    <strong>{{ totalResults }}</strong> items found
+    <span *ngIf="filter.query"> (for "<em>{{ filter.query }}</em>")</span>
+  </span>
+  <span *ngIf="isLoading" class="spinner">⚡ Searching Elasticsearch...</span>
+</div>
+
+
+<div class="cards-grid" *ngIf="contents.length > 0">
+  <div class="movie-card" *ngFor="let item of contents" (click)="openExplainModal(item)">
+    <div class="card-poster">
+      <img [src]="item.poster || 'https://via.placeholder.com/300x450?text=No+Poster'" [alt]="item.title" loading="lazy" />
+      <div class="card-rating" *ngIf="item.imdbRating">⭐ {{ item.imdbRating }}</div>
+      <div class="card-type" [class.series]="item.contentType === 'SERIES'">{{ item.contentType }}</div>
+    </div>
+    
+    <div class="card-content">
+      <div class="card-meta">
+        <span *ngIf="item.year">{{ item.year }}</span>
+        <span *ngIf="item.year && item.runtimeMinutes"> • </span>
+        <span *ngIf="item.runtimeMinutes">{{ item.runtimeMinutes }} min</span>
+      </div>
+
+      <h3 class="card-title" [innerHTML]="getHighlightedTitle(item)"></h3>
+      
+      <p class="card-genre">{{ item.genre }}</p>
+      
+      <p class="card-plot" [innerHTML]="getHighlightedPlot(item)"></p>
+
+      <div class="card-cast" *ngIf="item.castNames && item.castNames.length > 0">
+        <strong>Cast:</strong> <span [innerHTML]="getHighlightedCast(item)"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="empty-state" *ngIf="!isLoading && contents.length === 0">
+  <div class="empty-icon">🍿</div>
+  <h3>No Results Found</h3>
+  <p>Try different keywords or reset active filters.</p>
+  <button type="button" class="reset-btn" (click)="clearFilters()">Reset Filters</button>
+</div>
+
+<!-- ==========================================================================
+     SLIDE-OVER
+     ========================================================================== -->
+<div class="drawer-backdrop" *ngIf="selectedExplainItem" (click)="closeExplainModal()">
+  <div class="drawer-panel" (click)="$event.stopPropagation()">
+    <!-- Drawer Header -->
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <span class="drawer-badge">ELASTICSEARCH EXPLAIN</span>
+        <h3>Search & Relevance Inspector</h3>
+      </div>
+      <button type="button" class="drawer-close-btn" (click)="closeExplainModal()">✕</button>
+    </div>
+
+    
+    <div class="drawer-body">
+      <div class="drawer-hero">
+        <img [src]="selectedExplainItem.poster || 'https://via.placeholder.com/100x150'" [alt]="selectedExplainItem.title" class="drawer-poster" />
+        <div class="drawer-hero-info">
+          <h2>{{ selectedExplainItem.title }}</h2>
+          <div class="drawer-meta-tags">
+            <span class="meta-tag">{{ selectedExplainItem.year }}</span>
+            <span class="meta-tag">{{ selectedExplainItem.genre }}</span>
+            <span class="meta-tag rating">⭐ {{ selectedExplainItem.imdbRating }}</span>
+          </div>
+          <div class="total-score-card">
+            <span class="score-label">Total BM25 Score:</span>
+            <strong class="score-number">{{ selectedExplainItem.score | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="drawer-section">
+        <div class="section-title">📊 Field Score Contributions</div>
+        <div class="score-cards-row">
+          <div class="mini-score-box">
+            <span class="box-label">🏷️ Title</span>
+            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.titleScore | number:'1.2-2' }}</strong>
+            <small>{{ filter.titleBoost }}x</small>
+          </div>
+          <div class="mini-score-box">
+            <span class="box-label">📝 Plot</span>
+            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.plotScore | number:'1.2-2' }}</strong>
+            <small>{{ filter.plotBoost }}x</small>
+          </div>
+          <div class="mini-score-box">
+            <span class="box-label">🎭 Cast</span>
+            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.castScore | number:'1.2-2' }}</strong>
+            <small>{{ filter.castBoost }}x</small>
+          </div>
+          <div class="mini-score-box">
+            <span class="box-label">🎬 Genre</span>
+            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.genreScore | number:'1.2-2' }}</strong>
+            <small>{{ filter.genreBoost }}x</small>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="drawer-section">
+        <div class="section-title">🔤 Matched Snippets (Highlighted)</div>
+        <div *ngIf="selectedExplainItem.matchExplanation?.highlightedSnippets && (selectedExplainItem.matchExplanation?.highlightedSnippets | json) !== '{}'">
+          <div *ngFor="let entry of selectedExplainItem.matchExplanation?.highlightedSnippets | keyvalue" class="highlight-card">
+            <div class="highlight-field-badge">
+              <span>FIELD: {{ entry.key | uppercase }}</span>
+              <span *ngIf="selectedExplainItem.matchExplanation?.termFrequencies?.[entry.key]" class="freq-tag">
+                {{ selectedExplainItem.matchExplanation?.termFrequencies?.[entry.key] }} match(es)
+              </span>
+            </div>
+            <div class="highlight-text" [innerHTML]="entry.value.join(' ... ')"></div>
+          </div>
+        </div>
+        <div *ngIf="!selectedExplainItem.matchExplanation?.highlightedSnippets || (selectedExplainItem.matchExplanation?.highlightedSnippets | json) === '{}'" class="no-highlight">
+          Applied active filter criteria instead of direct query match.
+        </div>
+      </div>
+
+      
+      <div class="drawer-section" *ngIf="selectedExplainItem.matchExplanation?.passedFilters?.length">
+        <div class="section-title">✅ Passed Filter Criteria</div>
+        <div class="passed-chips">
+          <span class="passed-chip" *ngFor="let f of selectedExplainItem.matchExplanation?.passedFilters">
+            ✔ {{ f }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="drawer-footer">
+      <button type="button" class="drawer-done-btn" (click)="closeExplainModal()">Close</button>
+    </div>
+  </div>
+</div>

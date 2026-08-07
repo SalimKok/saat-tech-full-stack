@@ -1,0 +1,22 @@
+<div class="stream-layout">
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="logo-icon">🎬</span>
+      <span class="logo-text">SAAT<span class="highlight">STREAM</span></span>
+    </div>
+    <div class="nav-actions">
+      <button class="sync-btn" (click)="syncIndex()" [disabled]="isSyncing">
+        {{ isSyncing ? '⏳ Syncing...' : '🔄 Sync ES' }}
+      </button>
+      <div class="nav-status">
+        <span class="status-dot"></span>
+        <span class="status-text">Elasticsearch: <strong>Active</strong></span>
+      </div>
+    </div>
+  </header>
+
+ 
+  <main class="container">
+    <app-content-search></app-content-search>
+  </main>
+</div>
