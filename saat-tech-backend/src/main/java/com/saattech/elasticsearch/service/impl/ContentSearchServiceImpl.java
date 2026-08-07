@@ -2,10 +2,11 @@ package com.saattech.elasticsearch.service.impl;
 
 import com.saattech.elasticsearch.ContentIndex;
 import com.saattech.elasticsearch.ContentQueryBuilder;
-import com.saattech.elasticsearch.SearchExplanationHelper;
+import com.saattech.elasticsearch.ReciprocalRankFusionHelper;
 import com.saattech.elasticsearch.ContentIndexMapper;
 import com.saattech.elasticsearch.repository.ContentElasticsearchRepository;
 import com.saattech.elasticsearch.service.ContentSearchService;
+import com.saattech.elasticsearch.service.EmbeddingService;
 import com.saattech.entity.Content;
 import com.saattech.enums.EntityStatus;
 import com.saattech.repository.ContentRepository;
@@ -18,11 +19,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.NoSuchIndexException;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,25 +39,68 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     private final ContentRepository contentRepository;
 
     private final ContentQueryBuilder queryBuilder;
-    private final SearchExplanationHelper explanationHelper;
+    private final ReciprocalRankFusionHelper rrfHelper;
     private final ContentIndexMapper indexMapper;
+    private final EmbeddingService embeddingService;
 
     @Override
     public Page<ContentIndex> search(String query, ContentFilterDto filter, Pageable pageable) {
-        log.info("================== ELASTICSEARCH SEARCH START ==================");
-        long startTime = System.currentTimeMillis();
-
+        log.info("================== ASYNC RRF HYBRID SEARCH START ==================");
+        long overallStartTime = System.currentTimeMillis();
         try {
-            NativeQuery nativeQuery = queryBuilder.buildSearchQuery(query, filter, pageable);
-            List<String> activeFilters = queryBuilder.extractActiveFilterNames(filter);
+            boolean hasText = query != null && !query.trim().isEmpty();
+            long[] metrics = new long[4]; //
 
-            SearchHits<ContentIndex> searchHits = elasticsearchOperations.search(nativeQuery, ContentIndex.class);
-            List<ContentIndex> contents = explanationHelper.processSearchHits(searchHits, activeFilters);
+            CompletableFuture<SearchHits<ContentIndex>> bm25Future = CompletableFuture.supplyAsync(() -> {
+                long start = System.currentTimeMillis();
+                NativeQuery textQuery = queryBuilder.buildTextQuery(query, filter, 40);
+                SearchHits<ContentIndex> hits = elasticsearchOperations.search(textQuery, ContentIndex.class);
+                metrics[0] = System.currentTimeMillis() - start;
+                return hits;
+            });
 
-            long tookMs = System.currentTimeMillis() - startTime;
-            log.info("==> [SUCCESS] Found {} items in {} ms", searchHits.getTotalHits(), tookMs);
-            return new PageImpl<>(contents, pageable, searchHits.getTotalHits());
+            CompletableFuture<List<SearchHit<ContentIndex>>> vectorFuture = CompletableFuture.supplyAsync(() -> {
+                if (!hasText) {
+                    return Collections.<SearchHit<ContentIndex>>emptyList();
+                }
+                long branchStart = System.currentTimeMillis();
+                try {
 
+                    long modelStart = System.currentTimeMillis();
+                    List<Float> vector = embeddingService.getEmbedding(query.trim());
+                    metrics[1] = System.currentTimeMillis() - modelStart;
+                    if (vector != null && !vector.isEmpty()) {
+
+                        long esVectorStart = System.currentTimeMillis();
+                        NativeQuery vectorQuery = queryBuilder.buildVectorQuery(vector, filter, 40);
+                        SearchHits<ContentIndex> hits = elasticsearchOperations.search(vectorQuery, ContentIndex.class);
+                        metrics[2] = System.currentTimeMillis() - esVectorStart;
+                        metrics[3] = System.currentTimeMillis() - branchStart;
+                        return hits.getSearchHits();
+                    }
+                } catch (Exception e) {
+                    log.warn("Async vector search skipped due to error: {}", e.getMessage());
+                }
+                metrics[3] = System.currentTimeMillis() - branchStart;
+                return Collections.<SearchHit<ContentIndex>>emptyList();
+            });
+
+            CompletableFuture.allOf(bm25Future, vectorFuture).join();
+            SearchHits<ContentIndex> bm25Hits = bm25Future.join();
+            List<SearchHit<ContentIndex>> vectorHits = vectorFuture.join();
+
+            List<ContentIndex> fusedResults = rrfHelper.fuseResults(bm25Hits.getSearchHits(), vectorHits);
+
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), fusedResults.size());
+            List<ContentIndex> pageContent = (start <= end && start < fusedResults.size())
+                    ? fusedResults.subList(start, end)
+                    : Collections.emptyList();
+            long totalTookMs = System.currentTimeMillis() - overallStartTime;
+
+            log.info("==> [PERFORMANCE REPORT] Total: {} ms | BM25: {} ms | Vector Branch: {} ms (Model: {} ms, ES KNN: {} ms) | Fused Unique Items: {}",
+                    totalTookMs, metrics[0], metrics[3], metrics[1], metrics[2], fusedResults.size());
+            return new PageImpl<>(pageContent, pageable, fusedResults.size());
         } catch (NoSuchIndexException e) {
             log.warn("==> [WARN] Index not found, syncing database to Elasticsearch...");
             syncAllContents();
@@ -63,7 +110,6 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
     }
-
     @Override
     public void indexContent(Content content) {
         if (content == null) return;

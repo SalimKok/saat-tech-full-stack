@@ -1,4 +1,6 @@
 package com.saattech.elasticsearch;
+import com.saattech.elasticsearch.service.EmbeddingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Component;
@@ -7,15 +9,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class SearchExplanationHelper {
 
-    public List<ContentIndex> processSearchHits(SearchHits<ContentIndex> searchHits, List<String> passedFilters) {
+    private final EmbeddingService embeddingService;
+
+    public List<ContentIndex> processSearchHits(SearchHits<ContentIndex> searchHits, List<String> passedFilters,  List<Float> queryVector) {
         return searchHits.getSearchHits().stream()
-                .map(hit -> mapToExplainedItem(hit, passedFilters))
+                .map(hit -> mapToExplainedItem(hit, passedFilters, queryVector))
                 .collect(Collectors.toList());
     }
 
-    private ContentIndex mapToExplainedItem(SearchHit<ContentIndex> hit, List<String> passedFilters) {
+    private ContentIndex mapToExplainedItem(SearchHit<ContentIndex> hit, List<String> passedFilters,  List<Float> queryVector) {
         ContentIndex item = hit.getContent();
         float totalScore = hit.getScore() > 0 ? hit.getScore() : 1.0f;
         item.setScore(totalScore);
@@ -35,6 +40,19 @@ public class SearchExplanationHelper {
                 frequencies.put(field, Math.max(count, 1));
             }
         });
+
+        Double semanticScore = null;
+        String semanticPercentage = null;
+        boolean isSemantic = false;
+        if (queryVector != null && !queryVector.isEmpty() && item.getPlotVector() != null && !item.getPlotVector().isEmpty()) {
+            semanticScore = embeddingService.calculateCosineSimilarity(queryVector, item.getPlotVector());
+            semanticScore = Math.round(semanticScore * 10000.0) / 10000.0;
+            semanticPercentage = String.format("%%% .1f", Math.max(0.0, semanticScore * 100));
+            isSemantic = semanticScore >= 0.25;
+            if (isSemantic) {
+                matchedFields.add("semantic_plot");
+            }
+        }
 
         float titlePts = matchedFields.contains("title") ? totalScore * 0.5f : 0f;
         float plotPts  = matchedFields.contains("plot") ? totalScore * 0.35f : 0f;

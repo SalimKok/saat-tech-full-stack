@@ -24,4 +24,8 @@ public class MatchExplanationDto {
     private Map<String, Integer> termFrequencies;
     private List<String> passedFilters;
     private String decisionSummary;
+
+    private Double semanticSimilarityScore;
+    private String semanticSimilarityPercentage;
+    private Boolean isSemanticMatch;
 }

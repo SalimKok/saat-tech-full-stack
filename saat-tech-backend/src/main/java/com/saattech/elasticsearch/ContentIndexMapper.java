@@ -1,14 +1,23 @@
 package com.saattech.elasticsearch;
 
+import com.saattech.elasticsearch.service.EmbeddingService;
 import com.saattech.entity.Content;
 import com.saattech.entity.Metadata;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class ContentIndexMapper {
+
+    private final EmbeddingService embeddingService;
+
     public ContentIndex toIndex(Content content) {
         if (content == null) return null;
         Metadata metadata = content.getMetadata();
@@ -24,6 +33,17 @@ public class ContentIndexMapper {
             year = metadata.getReleased().getYear();
         }
         Integer runtimeMinutes = parseRuntimeMinutes(metadata != null ? metadata.getRuntime() : null);
+
+
+        List<Float> plotVector = Collections.emptyList();
+        if (metadata != null && metadata.getPlot() != null && !metadata.getPlot().trim().isEmpty()) {
+            try {
+                plotVector = embeddingService.getEmbedding(metadata.getPlot());
+            } catch (Exception e) {
+                log.warn("Could not generate vector embedding for content ID {}: {}", content.getId(), e.getMessage());
+            }
+        }
+
         return ContentIndex.builder()
                 .id(content.getId())
                 .contentType(content.getContentType())
@@ -38,6 +58,7 @@ public class ContentIndexMapper {
                 .poster(metadata != null ? metadata.getPoster() : null)
                 .runtimeMinutes(runtimeMinutes)
                 .castNames(castNames)
+                .plotVector(plotVector)
                 .build();
     }
     private Integer parseRuntimeMinutes(String runtime) {

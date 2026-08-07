@@ -1,6 +1,5 @@
 package com.saattech.elasticsearch;
 
-
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import com.saattech.specification.dto.ContentFilterDto;
 import org.springframework.data.domain.Pageable;
@@ -17,14 +16,12 @@ import java.util.List;
 @Component
 public class ContentQueryBuilder {
 
-    public NativeQuery buildSearchQuery(String query, ContentFilterDto filter, Pageable pageable) {
+    public NativeQuery buildTextQuery(String query, ContentFilterDto filter, int topK) {
         BoolQuery.Builder boolQuery = new BoolQuery.Builder();
-
         float titleBoost = (filter != null && filter.getTitleBoost() != null && filter.getTitleBoost() > 0) ? filter.getTitleBoost() : 3.0f;
         float plotBoost  = (filter != null && filter.getPlotBoost()  != null && filter.getPlotBoost()  > 0) ? filter.getPlotBoost()  : 1.5f;
         float castBoost  = (filter != null && filter.getCastBoost()  != null && filter.getCastBoost()  > 0) ? filter.getCastBoost()  : 1.0f;
         float genreBoost = (filter != null && filter.getGenreBoost() != null && filter.getGenreBoost() > 0) ? filter.getGenreBoost() : 1.0f;
-
         if (query != null && !query.trim().isEmpty()) {
             String trimmed = query.trim();
             List<String> dynamicFields = List.of(
@@ -33,7 +30,6 @@ public class ContentQueryBuilder {
                     "castNames^" + castBoost,
                     "genre^" + genreBoost
             );
-
             boolQuery.must(m -> m.multiMatch(mm -> mm
                     .query(trimmed)
                     .fields(dynamicFields)
@@ -41,15 +37,28 @@ public class ContentQueryBuilder {
                     .prefixLength(2)
             ));
         }
-
         applyFilters(boolQuery, filter);
-
-        Highlight highlight = buildHighlightConfiguration();
-
+        //Highlight highlight = buildHighlightConfiguration();
         return NativeQuery.builder()
                 .withQuery(boolQuery.build()._toQuery())
-                .withHighlightQuery(new HighlightQuery(highlight, ContentIndex.class))
-                .withPageable(pageable)
+                //.withHighlightQuery(new HighlightQuery(highlight, ContentIndex.class))
+                .withPageable(org.springframework.data.domain.PageRequest.of(0, topK))
+                .build();
+    }
+
+    public NativeQuery buildVectorQuery(List<Float> queryVector, ContentFilterDto filter, int topK) {
+        BoolQuery.Builder boolQuery = new BoolQuery.Builder();
+        if (queryVector != null && !queryVector.isEmpty()) {
+            boolQuery.must(m -> m.knn(k -> k
+                    .field("plotVector")
+                    .queryVector(queryVector)
+                    .numCandidates(100)
+            ));
+        }
+        applyFilters(boolQuery, filter);
+        return NativeQuery.builder()
+                .withQuery(boolQuery.build()._toQuery())
+                .withPageable(org.springframework.data.domain.PageRequest.of(0, topK))
                 .build();
     }
 

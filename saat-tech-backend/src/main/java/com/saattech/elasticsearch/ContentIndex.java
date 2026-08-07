@@ -68,5 +68,8 @@ public class ContentIndex {
 
     @Transient
     private MatchExplanationDto matchExplanation;
+
+    @Field(type = FieldType.Dense_Vector, dims = 384, similarity = "cosine")
+    private List<Float> plotVector;
 }
 
