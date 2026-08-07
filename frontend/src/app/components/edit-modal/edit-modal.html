@@ -1,0 +1,129 @@
+@if (movie && editingMovie) {
+  <div class="modal-overlay" (click)="!editLoading && close()">
+    <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Content & Metadata</h3>
+        <button class="close-btn" (click)="close()" [disabled]="editLoading">&times;</button>
+      </div>
+
+      @if (editErrorMessage) {
+        <div class="alert error">{{ editErrorMessage }}</div>
+      }
+
+      <div class="modal-body">
+        <div class="modal-two-columns">
+          
+          <div class="column-left">
+            <h4 class="column-title">Content & Metadata Details</h4>
+
+            <div class="form-row">
+              <div class="form-group flex-2">
+                <label>Title:</label>
+                <input type="text" [(ngModel)]="editingMovie.metadata.title" />
+              </div>
+              <div class="form-group flex-1">
+                <label>Content Type:</label>
+                <select [(ngModel)]="editingMovie.contentType" (ngModelChange)="onContentTypeChange($event)">
+                  <option value="MOVIE">MOVIE</option>
+                  <option value="SERIES">SERIES</option>
+                  <option value="SEASON">SEASON</option>
+                  <option value="EPISODE">EPISODE</option>
+                </select>
+              </div>
+            </div>
+
+            @if (editingMovie.contentType === 'SEASON' || editingMovie.contentType === 'EPISODE') {
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label>Season Number:</label>
+                  <input type="number" min="1" [(ngModel)]="editingMovie.seasonNo" />
+                </div>
+                @if (editingMovie.contentType === 'EPISODE') {
+                  <div class="form-group flex-1">
+                    <label>Episode Number:</label>
+                    <input type="number" min="1" [(ngModel)]="editingMovie.episodeNo" />
+                  </div>
+                }
+              </div>
+            }
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Genre:</label>
+                <input type="text" [(ngModel)]="editingMovie.metadata.genre" />
+              </div>
+              <div class="form-group flex-1">
+                <label>IMDb Rating:</label>
+                <input type="number" step="0.1" min="0" max="10" [(ngModel)]="editingMovie.metadata.imdbRating" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Released Date:</label>
+                <input type="text" [(ngModel)]="editingMovie.metadata.released" />
+              </div>
+              <div class="form-group flex-1">
+                <label>Runtime:</label>
+                <input type="text" [(ngModel)]="editingMovie.metadata.runtime" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Language:</label>
+                <input type="text" [(ngModel)]="editingMovie.metadata.language" />
+              </div>
+              <div class="form-group flex-1">
+                <label>Country:</label>
+                <input type="text" [(ngModel)]="editingMovie.metadata.country" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Poster URL:</label>
+              <input type="text" [(ngModel)]="editingMovie.metadata.poster" />
+            </div>
+
+            <div class="form-group">
+              <label>Plot:</label>
+              <textarea rows="3" [(ngModel)]="editingMovie.metadata.plot"></textarea>
+            </div>
+
+            @if (editingMovie.contentType === 'SERIES' || editingMovie.contentType === 'SEASON') {
+              <div class="cascade-box">
+                <input 
+                  type="checkbox" 
+                  id="updateChildrenCheck" 
+                  [(ngModel)]="updateChildren" 
+                />
+                <label for="updateChildrenCheck">
+                  Apply changed metadata to all child {{ editingMovie.contentType === 'SERIES' ? 'seasons & episodes' : 'episodes' }}
+                </label>
+              </div>
+            }
+          </div>
+
+          
+          <div class="column-right">
+            <h4 class="column-title">Cast & Crew Management</h4>
+            @if (editingMovie.id) {
+              <app-content-cast-editor
+                [contentId]="editingMovie.id"
+                [(casts)]="editingMovie.casts">
+              </app-content-cast-editor>
+            }
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="cancel-btn" (click)="close()" [disabled]="editLoading">Cancel</button>
+        <button class="save-modal-btn" (click)="save()" [disabled]="editLoading">
+          {{ editLoading ? 'Saving Changes...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

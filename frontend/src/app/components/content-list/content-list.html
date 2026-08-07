@@ -1,0 +1,96 @@
+<div class="list-container">
+  <header class="header-section">
+    <div>
+      <h2>Saved Movies & Series</h2>
+      <p class="subtitle">Total items in database: <strong>{{ totalElements }}</strong></p>
+    </div>
+    <button class="refresh-btn" (click)="fetchMovies(currentPage)">Refresh List</button>
+  </header>
+
+
+  <div class="movie-dashboard-layout">
+    
+    <aside class="sidebar-area">
+      <app-content-filter (filterChanged)="onFilterChanged($event)"></app-content-filter>
+    </aside>
+
+    <main class="main-content-area">
+      @if (loading) {
+        <div class="loading-box">
+          <p>Loading movies, please wait...</p>
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div class="alert error">{{ errorMessage }}</div>
+      }
+
+      @if (!loading && movies.length === 0) {
+        <div class="empty-state">
+          <p>No content found matching your filter criteria.</p>
+        </div>
+      }
+
+      <div class="movie-grid">
+        @for (movie of movies; track movie.id ?? $index) {
+          <article class="movie-card" (click)="openDetailModal(movie)" style="cursor: pointer;">
+            <div class="card-poster">
+              <img [src]="movie.metadata.poster" [alt]="movie.metadata.title" />
+            </div>
+            <div class="card-body">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="type-badge">{{ movie.contentType }}</span>
+                @if (movie.contentType === 'SERIES' && movie.subContents?.length) {
+                  <span style="font-size: 11px; color: var(--primary); font-weight: bold;">{{ movie.subContents?.length }} Season(s)</span>
+                } @else if (movie.contentType === 'SEASON' && movie.subContents?.length) {
+                  <span style="font-size: 11px; color: var(--primary); font-weight: bold;">{{ movie.subContents?.length }} Episode(s)</span>
+                }
+              </div>
+
+              <h3>{{ movie.metadata.title }}</h3>
+              <p class="genre">{{ movie.metadata.genre }}</p>
+              <p class="rating">⭐ {{ movie.metadata.imdbRating }} / 10</p>
+              <p class="plot-snippet">{{ movie.metadata.plot }}</p>
+
+            </div>
+          </article>
+        }
+      </div>
+
+      @if (totalElements > 0) {
+        <nav class="pagination-section" aria-label="Pagination">
+          <button 
+            class="page-btn" 
+            (click)="onPrevPage()" 
+            [disabled]="currentPage === 0">
+            ⬅️ Previous
+          </button>
+
+          <span class="page-info">
+            Page <strong>{{ currentPage + 1 }}</strong> of <strong>{{ totalPages || 1 }}</strong>
+          </span>
+
+          <button 
+            class="page-btn" 
+            (click)="onNextPage()" 
+            [disabled]="currentPage >= totalPages - 1">
+            Next ➡️
+          </button>
+        </nav>
+      }
+    </main>
+  </div>
+</div>
+
+<app-content-detail-modal
+  [contentId]="selectedDetailId"
+  (closed)="onDetailModalClosed()"
+  (editRequested)="openEditModal($event)"
+  (contentChanged)="fetchMovies(currentPage)">
+</app-content-detail-modal>
+
+<app-edit-modal
+  [movie]="selectedMovie"
+  (closed)="onModalClosed()"
+  (saved)="onMovieSaved()">
+</app-edit-modal>

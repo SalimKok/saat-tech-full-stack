@@ -1,0 +1,72 @@
+@if (isOpen) {
+  <div class="bulk-modal-backdrop" (click)="close()">
+    <div class="bulk-modal-card" (click)="$event.stopPropagation()">
+      
+      <div class="bulk-modal-header">
+        <div>
+          <h3>Bulk Import from OMDb</h3>
+          <p class="subtitle">Paste IMDb IDs separated by commas, newlines, spaces, or as a JSON array.</p>
+        </div>
+        <button type="button" class="btn-close" (click)="close()" title="Close">✕</button>
+      </div>
+
+     
+      @if (bulkErrorMessage) {
+        <div class="alert error" style="margin-bottom: 12px;">{{ bulkErrorMessage }}</div>
+      }
+
+     
+      <div class="form-group">
+        <div class="textarea-header">
+          <label>IMDb ID List:</label>
+          <div class="quick-actions">
+            <button type="button" class="btn-link text-danger" (click)="clearText()">Clear</button>
+          </div>
+        </div>
+        <textarea 
+          rows="6" 
+          [(ngModel)]="bulkIdsText" 
+          placeholder="e.g.&#10;tt0111161, tt0068646, tt0468569&#10;tt1375666&#10;tt0816692"
+          class="bulk-textarea"
+          [disabled]="bulkLoading">
+        </textarea>
+      </div>
+
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="close()" [disabled]="bulkLoading">
+          Close
+        </button>
+        <button type="button" class="btn-success" (click)="onExecuteBulkImport()" [disabled]="bulkLoading || !bulkIdsText.trim()">
+          {{ bulkLoading ? 'Fetching & Importing...' : 'Start Bulk Import' }}
+        </button>
+      </div>
+
+     
+      @if (bulkResult) {
+        <div class="bulk-result-section">
+          <div class="bulk-stats-row">
+            <span class="stat-pill total">Total: {{ bulkResult.totalRequested }}</span>
+            <span class="stat-pill success"> Successful: {{ bulkResult.successCount }}</span>
+            <span class="stat-pill danger"> Failed: {{ bulkResult.failedCount }}</span>
+          </div>
+
+          <div class="bulk-log-console">
+            <div class="console-title">Execution Logs:</div>
+            @for (id of bulkResult.successfulIds; track id) {
+              <div class="log-line log-success">
+                <span class="log-badge success">OK</span> {{ id }} successfully imported into DB and indexed in Elasticsearch.
+              </div>
+            }
+            @for (err of bulkResult.failedIds; track err) {
+              <div class="log-line log-danger">
+                <span class="log-badge danger">ERR</span> {{ err }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+}

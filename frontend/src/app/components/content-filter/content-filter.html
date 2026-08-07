@@ -1,0 +1,99 @@
+<div class="card filter-card">
+  <div class="filter-header">
+    <h3>Filters</h3>
+  </div>
+
+  <div class="filter-vertical-form">
+    <div class="filter-group">
+      <label for="filterTitle">Title:</label>
+      <input 
+        id="filterTitle"
+        type="text" 
+        [(ngModel)]="filter.title" 
+        (keyup.enter)="onSearch()"
+        placeholder="e.g. Breaking Bad..." 
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="filterGenre">Genre:</label>
+      <input 
+        id="filterGenre"
+        type="text" 
+        [(ngModel)]="filter.genre" 
+        (keyup.enter)="onSearch()"
+        placeholder="e.g. Action, Drama..." 
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="filterType">Content Type:</label>
+      <select 
+        id="filterType" 
+        [(ngModel)]="filter.contentType" 
+        (ngModelChange)="onSearch()">
+        <option value="">All Types</option>
+        <option value="MOVIE">MOVIE</option>
+        <option value="SERIES">SERIES</option>
+        <option value="SEASON">SEASON</option>
+        <option value="EPISODE">EPISODE</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filterRating">Min Rating:</label>
+      <select 
+        id="filterRating" 
+        [(ngModel)]="filter.minRating" 
+        (ngModelChange)="onSearch()">
+        <option [ngValue]="null">Any Rating</option>
+        <option [ngValue]="1">⭐ 1.0+</option>
+        <option [ngValue]="2">⭐ 2.0+</option>
+        <option [ngValue]="3">⭐ 3.0+</option>
+        <option [ngValue]="4">⭐ 4.0+</option>
+        <option [ngValue]="5">⭐ 5.0+</option>
+        <option [ngValue]="6">⭐ 6.0+</option>
+        <option [ngValue]="7">⭐ 7.0+</option>
+        <option [ngValue]="8">⭐ 8.0+</option>
+        <option [ngValue]="9">⭐ 9.0+</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filterYear">Year:</label>
+      <input 
+        id="filterYear"
+        type="number" 
+        min="1900" 
+        max="2099"
+        [(ngModel)]="filter.year" 
+        (keyup.enter)="onSearch()"
+        placeholder="e.g. 2023" 
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="filterStatus">Status:</label>
+      <select 
+        id="filterStatus" 
+        [(ngModel)]="filter.status" 
+        (ngModelChange)="onSearch()">
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="DELETED">DELETED</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button type="button" class="btn-primary" (click)="onSearch()">
+        Filter
+      </button>
+      <button 
+        type="button" 
+        class="btn-secondary" 
+        (click)="onReset()" 
+        [disabled]="!isFiltered">
+        Clear
+      </button>
+    </div>
+  </div>
+</div>

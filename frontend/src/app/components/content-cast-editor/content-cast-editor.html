@@ -1,0 +1,76 @@
+<div class="cast-section">
+  <label class="section-title">Assigned Cast & Crew:</label>
+
+  @if (errorMessage) {
+    <div class="cast-alert error">{{ errorMessage }}</div>
+  }
+
+  <!-- 1. Eklenmiş Olan Kişilerin Rozetleri (Chips) -->
+  <div class="cast-chips-container">
+    @if (!casts || casts.length === 0) {
+      <p class="no-cast-text">No cast members assigned yet.</p>
+    }
+    @for (c of casts; track c.cast?.id ?? $index) {
+      <div class="cast-badge">
+        <span class="role-tag" [ngClass]="c.role.toLowerCase()">{{ c.role }}</span>
+        <span class="cast-name">{{ c.cast?.name || 'Unknown' }}</span>
+        <button 
+          type="button" 
+          class="remove-cast-btn" 
+          (click)="onRemoveCast(c.cast?.id)" 
+          [disabled]="actionLoading"
+          title="Remove from movie">
+          &times;
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- 2. Yeni Kişi Ekleme Kutusu -->
+  <div class="add-cast-box">
+    <h4>Add Cast / Crew Member</h4>
+
+    <div class="form-group">
+      <label>Choose Existing Person:</label>
+      <select [(ngModel)]="selectedExistingCastId" [disabled]="!!newCastName.trim() || actionLoading">
+        <option [ngValue]="null">-- Select Existing Person --</option>
+        @for (person of allCasts; track person.id) {
+          <option [ngValue]="person.id">{{ person.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="or-separator">
+      <span>— OR CREATE NEW —</span>
+    </div>
+
+    <div class="form-group">
+      <label>New Person Name:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="newCastName" 
+        placeholder="Enter name (e.g. Bryan Cranston)..." 
+        [disabled]="!!selectedExistingCastId || actionLoading" 
+      />
+    </div>
+
+    <div class="form-row" style="margin-top: 14px; align-items: flex-end; gap: 10px;">
+      <div class="form-group flex-1">
+        <label>Role:</label>
+        <select [(ngModel)]="selectedRole" [disabled]="actionLoading">
+          <option value="ACTOR">ACTOR</option>
+          <option value="DIRECTOR">DIRECTOR</option>
+          <option value="WRITER">WRITER</option>
+        </select>
+      </div>
+
+      <button 
+        type="button" 
+        class="btn-primary add-cast-btn" 
+        (click)="onAddCast()" 
+        [disabled]="(!selectedExistingCastId && !newCastName.trim()) || actionLoading">
+        {{ actionLoading ? 'Adding...' : '+ Add Member' }}
+      </button>
+    </div>
+  </div>
+</div>

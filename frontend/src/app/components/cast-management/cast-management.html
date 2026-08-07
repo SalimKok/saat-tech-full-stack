@@ -1,0 +1,157 @@
+<div class="page-container">
+  
+  <div class="header-section">
+    <div>
+      <h2>Cast & Crew Management</h2>
+      <p class="subtitle">Total registered people: <strong>{{ totalElements }}</strong></p>
+    </div>
+    <button class="btn-secondary" (click)="fetchCasts(currentPage)" [disabled]="loading">Refresh List</button>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert error">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="alert success">{{ successMessage }}</div>
+  }
+
+  <!-- Kişi Ekleme Formu -->
+  <div class="card" style="margin-bottom: 20px;">
+    <h3 style="margin-top: 0; font-size: 16px; margin-bottom: 12px;">Add New Cast / Crew Person</h3>
+    <div class="form-row" style="margin-bottom: 0;">
+      <div class="form-group flex-2">
+        <input 
+          type="text" 
+          [(ngModel)]="newCastName" 
+          placeholder="Full name (e.g. Christopher Nolan, Cillian Murphy)..." 
+          (keyup.enter)="onAddCast()"
+          [disabled]="isAdding"
+        />
+      </div>
+      <div class="form-group flex-2">
+        <input 
+          type="text" 
+          [(ngModel)]="newCastPoster" 
+          placeholder="Photo URL (e.g. https://.../photo.jpg)..." 
+          (keyup.enter)="onAddCast()"
+          [disabled]="isAdding"
+        />
+      </div>
+      <button class="btn-primary" (click)="onAddCast()" [disabled]="!newCastName.trim() || isAdding">
+        {{ isAdding ? 'Adding...' : '+ Add Person' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Arama Alanı -->
+  <div class="card" style="margin-bottom: 20px; padding: 12px 18px;">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (input)="onSearchChange()" 
+      placeholder="Search cast member by name..." 
+    />
+  </div>
+
+  @if (loading) {
+    <div style="text-align: center; padding: 40px; color: var(--primary);">
+      <p>Loading cast members, please wait...</p>
+    </div>
+  } @else if (casts.length === 0) {
+    <div class="card" style="text-align: center; padding: 40px;">
+      <p style="color: var(--text-muted);">No cast members found.</p>
+    </div>
+  } @else {
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 70px;">ID</th>
+            <th style="width: 80px; text-align: center;">Photo</th>
+            <th>Full Name</th>
+            <th style="width: 180px; text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of casts; track c.id) {
+            <tr>
+              <td style="color: var(--text-muted); font-weight: bold;">#{{ c.id }}</td>
+              
+              <td style="text-align: center;">
+                @if (editingCastId === c.id) {
+                  <input 
+                    type="text" 
+                    [(ngModel)]="editingCastPoster" 
+                    placeholder="Photo URL..." 
+                    style="font-size: 12px; padding: 4px 6px;"
+                  />
+                } @else {
+                  @if (c.poster) {
+                    <img 
+                      [src]="c.poster" 
+                      alt="Avatar" 
+                      style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); vertical-align: middle;" 
+                    />
+                  } @else {
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #2a2a2a; border: 1px solid var(--border-color); display: inline-flex; align-items: center; justify-content: center; font-size: 18px;">
+                      👤
+                    </div>
+                  }
+                }
+              </td>
+
+              <td>
+                @if (editingCastId === c.id) {
+                  <input 
+                    type="text" 
+                    [(ngModel)]="editingCastName" 
+                    (keyup.enter)="c.id && saveEdit(c.id)"
+                    (keyup.escape)="cancelEdit()"
+                  />
+                } @else {
+                  <span style="font-weight: 600; font-size: 15px;">{{ c.name }}</span>
+                }
+              </td>
+
+              <td style="text-align: center;">
+                <div style="display: inline-flex; gap: 6px;">
+                  @if (editingCastId === c.id) {
+                    <button class="btn-success" style="padding: 4px 10px; font-size: 12px;" (click)="c.id && saveEdit(c.id)">Save</button>
+                    <button class="btn-secondary" style="padding: 4px 10px; font-size: 12px;" (click)="cancelEdit()">Cancel</button>
+                  } @else {
+                    <button class="edit-btn" style="padding: 4px 10px; font-size: 12px;" (click)="startEdit(c)">Edit</button>
+                    <button class="delete-btn" style="padding: 4px 10px; font-size: 12px;" (click)="onDelete(c.id, c.name)">Delete</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SAYFALAMA KONTROLLERİ -->
+    @if (totalPages > 1) {
+      <div class="pagination-section">
+        <button 
+          class="page-btn" 
+          (click)="onPrevPage()" 
+          [disabled]="currentPage === 0">
+          ⬅️ Previous
+        </button>
+
+        <span class="page-info">
+          Page <strong>{{ currentPage + 1 }}</strong> of <strong>{{ totalPages }}</strong>
+          (Total: <strong>{{ totalElements }}</strong> people)
+        </span>
+
+        <button 
+          class="page-btn" 
+          (click)="onNextPage()" 
+          [disabled]="currentPage >= totalPages - 1">
+          Next ➡️
+        </button>
+      </div>
+    }
+  }
+</div>
