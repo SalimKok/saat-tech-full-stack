@@ -18,6 +18,7 @@ public class MatchExplanationDto {
     private Float plotScore;
     private Float castScore;
     private Float genreScore;
+    private Float bm25Score;
 
     private List<String> matchedFields;
     private Map<String, List<String>> highlightedSnippets;

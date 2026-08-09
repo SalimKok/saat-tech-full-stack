@@ -18,16 +18,16 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "contents", createIndex = false)
+@Document(indexName = "contents")
 public class ContentIndex {
 
     @Id
     private Long id;
 
-    @Field(type = FieldType.Text, analyzer = "standard")
+    @Field(type = FieldType.Text, analyzer = "english")
     private String title;
 
-    @Field(type = FieldType.Text, analyzer = "standard")
+    @Field(type = FieldType.Text, analyzer = "english")
     private String plot;
 
     @Field(type = FieldType.Text)

@@ -69,41 +69,6 @@ public class OllamaEmbeddingServiceImpl implements EmbeddingService {
         return Collections.emptyList();
     }
 
-    @Override
-    public double calculateCosineSimilarity(List<Float> vector1, List<Float> vector2) {
-        if (vector1 == null || vector2 == null || vector1.isEmpty() || vector2.isEmpty()) {
-            return 0.0;
-        }
-
-        double dotProduct = 0.0;
-        double normA = 0.0;
-        double normB = 0.0;
-
-        for (int i = 0; i < Math.min(vector1.size(), vector2.size()); i++) {
-            dotProduct += vector1.get(i) * vector2.get(i);
-            normA += Math.pow(vector1.get(i), 2);
-            normB += Math.pow(vector2.get(i), 2);
-        }
-
-        if (normA == 0.0 || normB == 0.0) {
-            return 0.0;
-        }
-
-        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-    }
-
-    @Override
-    public boolean isAvailable() {
-        try {
-            RestTemplate restTemplate = restTemplateBuilder
-                    .connectTimeout(Duration.ofMillis(1000))
-                    .build();
-            ResponseEntity<String> response = restTemplate.getForEntity(ollamaUrl + "/api/tags", String.class);
-            return response.getStatusCode().is2xxSuccessful();
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     @EventListener(ApplicationReadyEvent.class)
     public void warmupModel() {
@@ -115,6 +80,4 @@ public class OllamaEmbeddingServiceImpl implements EmbeddingService {
             log.warn("Ollama warmup skipped: {}", e.getMessage());
         }
     }
-
 }
-

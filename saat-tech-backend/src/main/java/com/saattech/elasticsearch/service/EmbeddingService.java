@@ -6,7 +6,4 @@ public interface EmbeddingService {
 
     List<Float> getEmbedding(String text);
 
-    double calculateCosineSimilarity(List<Float> vector1, List<Float> vector2);
-
-    boolean isAvailable();
 }

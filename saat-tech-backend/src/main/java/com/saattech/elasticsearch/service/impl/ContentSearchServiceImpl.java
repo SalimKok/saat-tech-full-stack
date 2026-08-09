@@ -49,14 +49,22 @@ public class ContentSearchServiceImpl implements ContentSearchService {
         long overallStartTime = System.currentTimeMillis();
         try {
             boolean hasText = query != null && !query.trim().isEmpty();
-            long[] metrics = new long[4]; //
+            long[] metrics = new long[4];
 
-            CompletableFuture<SearchHits<ContentIndex>> bm25Future = CompletableFuture.supplyAsync(() -> {
+            int topK = Math.max(60, (int) pageable.getOffset() + pageable.getPageSize());
+
+            CompletableFuture<List<SearchHit<ContentIndex>>> bm25Future = CompletableFuture.supplyAsync(() -> {
                 long start = System.currentTimeMillis();
-                NativeQuery textQuery = queryBuilder.buildTextQuery(query, filter, 40);
-                SearchHits<ContentIndex> hits = elasticsearchOperations.search(textQuery, ContentIndex.class);
+                try {
+                    NativeQuery textQuery = queryBuilder.buildTextQuery(query, filter, topK);
+                    SearchHits<ContentIndex> hits = elasticsearchOperations.search(textQuery, ContentIndex.class);
+                    metrics[0] = System.currentTimeMillis() - start;
+                    return hits.getSearchHits();
+                } catch (Exception e) {
+                    log.warn("Async BM25 search skipped due to error: {}", e.getMessage());
+                }
                 metrics[0] = System.currentTimeMillis() - start;
-                return hits;
+                return Collections.<SearchHit<ContentIndex>>emptyList();
             });
 
             CompletableFuture<List<SearchHit<ContentIndex>>> vectorFuture = CompletableFuture.supplyAsync(() -> {
@@ -72,7 +80,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
                     if (vector != null && !vector.isEmpty()) {
 
                         long esVectorStart = System.currentTimeMillis();
-                        NativeQuery vectorQuery = queryBuilder.buildVectorQuery(vector, filter, 40);
+                        NativeQuery vectorQuery = queryBuilder.buildVectorQuery(vector, filter, topK);
                         SearchHits<ContentIndex> hits = elasticsearchOperations.search(vectorQuery, ContentIndex.class);
                         metrics[2] = System.currentTimeMillis() - esVectorStart;
                         metrics[3] = System.currentTimeMillis() - branchStart;
@@ -86,10 +94,10 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             });
 
             CompletableFuture.allOf(bm25Future, vectorFuture).join();
-            SearchHits<ContentIndex> bm25Hits = bm25Future.join();
+            List<SearchHit<ContentIndex>> bm25Hits = bm25Future.join();
             List<SearchHit<ContentIndex>> vectorHits = vectorFuture.join();
 
-            List<ContentIndex> fusedResults = rrfHelper.fuseResults(bm25Hits.getSearchHits(), vectorHits);
+            List<ContentIndex> fusedResults = rrfHelper.fuseResults(bm25Hits, vectorHits);
 
             int start = (int) pageable.getOffset();
             int end = Math.min((start + pageable.getPageSize()), fusedResults.size());
@@ -98,7 +106,8 @@ public class ContentSearchServiceImpl implements ContentSearchService {
                     : Collections.emptyList();
             long totalTookMs = System.currentTimeMillis() - overallStartTime;
 
-            log.info("==> [PERFORMANCE REPORT] Total: {} ms | BM25: {} ms | Vector Branch: {} ms (Model: {} ms, ES KNN: {} ms) | Fused Unique Items: {}",
+            log.info(
+                    "==> [PERFORMANCE REPORT] Total: {} ms | BM25: {} ms | Vector Branch: {} ms (Model: {} ms, ES KNN: {} ms) | Fused Unique Items: {}",
                     totalTookMs, metrics[0], metrics[3], metrics[1], metrics[2], fusedResults.size());
             return new PageImpl<>(pageContent, pageable, fusedResults.size());
         } catch (NoSuchIndexException e) {
@@ -110,9 +119,11 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
     }
+
     @Override
     public void indexContent(Content content) {
-        if (content == null) return;
+        if (content == null)
+            return;
         if (content.getStatus() == EntityStatus.DELETED) {
             deleteContentIndex(content.getId());
             return;
