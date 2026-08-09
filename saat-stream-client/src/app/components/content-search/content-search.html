@@ -9,7 +9,6 @@
       class="search-input" 
       placeholder="Search by title, synopsis, or cast..." 
       [(ngModel)]="filter.query"
-      (input)="onSearchInput()"
       (keyup.enter)="onSearchSubmit()"
     />
     <div class="search-actions">
@@ -69,13 +68,19 @@
 
   
   <div class="filters-row">
+    
     <div class="filter-group">
       <span class="filter-label">Type:</span>
-      <button type="button" class="pill-btn" [class.active]="filter.contentType === ''" (click)="onContentTypeChange('')">All</button>
-      <button type="button" class="pill-btn" [class.active]="filter.contentType === 'MOVIE'" (click)="onContentTypeChange('MOVIE')">🎬 Movie</button>
-      <button type="button" class="pill-btn" [class.active]="filter.contentType === 'SERIES'" (click)="onContentTypeChange('SERIES')">📺 Series</button>
+      <button 
+        type="button" 
+        *ngFor="let type of contentTypes"
+        class="pill-btn" 
+        [class.active]="filter.contentType === type.value" 
+        (click)="onContentTypeChange(type.value)">
+        {{ type.label }}
+      </button>
     </div>
-
+   
     <div class="filter-group">
       <span class="filter-label">Genre:</span>
       <button 
@@ -87,12 +92,22 @@
         {{ g }}
       </button>
     </div>
-
-    <div class="filter-group">
-      <span class="filter-label">Rating:</span>
-      <button type="button" class="pill-btn" [class.active]="filter.minRating === undefined" (click)="onRatingChange(undefined)">All</button>
-      <button type="button" class="pill-btn" [class.active]="filter.minRating === 8.0" (click)="onRatingChange(8.0)">⭐ 8.0+</button>
-      <button type="button" class="pill-btn" [class.active]="filter.minRating === 8.5" (click)="onRatingChange(8.5)">🔥 8.5+</button>
+    
+    <div class="filter-group" style="display: flex; align-items: center; gap: 12px; background: #141724; border: 1px solid #232738; padding: 6px 16px; border-radius: 30px;">
+      <span class="filter-label" style="margin: 0; font-size: 13px;">
+        Rating: 
+        <strong style="color: #45f3ff; display: inline-block; width: 34px;">
+          {{ filter.minRating ? (filter.minRating | number:'1.1-1') + '+' : 'All' }}
+        </strong>
+      </span>
+      <input 
+        type="range" 
+        min="0" 
+        max="10" 
+        step="0.5" 
+        [value]="filter.minRating || 0" 
+        (change)="onSliderRatingChange($event)" 
+        style="accent-color: #45f3ff; cursor: pointer; width: 140px; margin: 0; height: 6px;" />
     </div>
   </div>
 </section>
@@ -168,10 +183,27 @@
             <span class="meta-tag">{{ selectedExplainItem.genre }}</span>
             <span class="meta-tag rating">⭐ {{ selectedExplainItem.imdbRating }}</span>
           </div>
-          <div class="total-score-card">
-            <span class="score-label">Total BM25 Score:</span>
-            <strong class="score-number">{{ selectedExplainItem.score | number:'1.2-2' }}</strong>
+                  <div style="background: #191c2b; padding: 12px; border-radius: 8px; margin-top: 12px; font-size: 13px; color: #cbd5e1; border: 1px solid #232738;">
+            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #2e334a;">
+              <span style="color:#60a5fa; font-weight:bold;">Match Type:</span> 
+              <span style="color: #ffffff;">{{ selectedExplainItem.matchExplanation?.decisionSummary }}</span>
+            </div>
+            <div style="display: flex; gap: 20px; justify-content: space-between;">
+              <div>
+                <span style="color:#8a8d9b; display:block; font-size: 11px;">RRF Score</span> 
+                <strong style="color:#45f3ff;">{{ selectedExplainItem.score | number:'1.2-4' }}</strong>
+              </div>
+              <div>
+                <span style="color:#8a8d9b; display:block; font-size: 11px;">BM25 (Text)</span> 
+                <strong style="color:#4ade80;">{{ selectedExplainItem.matchExplanation?.bm25Score | number:'1.2-2' }}</strong>
+              </div>
+              <div>
+                <span style="color:#8a8d9b; display:block; font-size: 11px;">Semantic (Vector)</span> 
+                <strong style="color:#a855f7;">{{ selectedExplainItem.matchExplanation?.semanticSimilarityScore | number:'1.2-4' }}</strong>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
 

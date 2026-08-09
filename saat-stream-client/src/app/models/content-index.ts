@@ -10,6 +10,9 @@ export interface MatchExplanation {
   passedFilters?: string[];
   decisionSummary?: string;
   functionalReason?: string;
+  bm25Score?: number;
+  semanticSimilarityScore?: number;
+  isSemanticMatch?: boolean;
 }
 export interface ContentIndex {
   id: number;

@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ContentSearchService } from '../../services/content-search-service';
 import { ContentIndex, SearchFilter } from '../../models/content-index';
 
@@ -13,14 +11,20 @@ import { ContentIndex, SearchFilter } from '../../models/content-index';
   templateUrl: './content-search.html',
   styleUrl: './content-search.css'
 })
-export class ContentSearchComponent implements OnInit, OnDestroy {
+export class ContentSearchComponent implements OnInit{
   private readonly searchService = inject(ContentSearchService);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly searchSubject = new Subject<string>();
-  private searchSubscription?: Subscription;
 
   showBoostSettings = false;
   selectedExplainItem: ContentIndex | null = null;
+
+    readonly contentTypes = [
+    { label: 'All', value: '' },
+    { label: 'Movie', value: 'MOVIE' },
+    { label: 'Series', value: 'SERIES' },
+    { label: 'Season', value: 'SEASON' },
+    { label: 'Episode', value: 'EPISODE' }
+  ];
 
   readonly genres: readonly string[] = [
     'All',
@@ -50,24 +54,7 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
   isLoading = false;
 
   ngOnInit(): void {
-    this.searchSubscription = this.searchSubject
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(() => {
-        this.fetchSearchResults();
-      });
-
     this.fetchSearchResults();
-  }
-
-  ngOnDestroy(): void {
-    this.searchSubscription?.unsubscribe();
-  }
-
-  onSearchInput(): void {
-    this.searchSubject.next(this.filter.query || '');
   }
 
   onSearchSubmit(): void {
@@ -84,8 +71,9 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
     this.fetchSearchResults();
   }
 
-  onRatingChange(rating?: number): void {
-    this.filter.minRating = rating;
+  onSliderRatingChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.filter.minRating = val === 0 ? undefined : val;
     this.fetchSearchResults();
   }
 
@@ -118,6 +106,7 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
     this.selectedExplainItem = null;
     this.cdr.markForCheck();
   }
+
 
   getHighlightedTitle(item: ContentIndex): string {
     if (item.matchExplanation?.highlightedSnippets?.['title']?.length) {
