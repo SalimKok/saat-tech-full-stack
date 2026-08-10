@@ -36,6 +36,8 @@ export class ContentSearchComponent implements OnInit{
     'Adventure'
   ];
 
+  hybridBalance: number = 75;
+
   filter: SearchFilter = {
     query: '',
     contentType: '',
@@ -52,6 +54,7 @@ export class ContentSearchComponent implements OnInit{
   contents: ContentIndex[] = [];
   totalResults = 0;
   isLoading = false;
+  totalPages = 0;
 
   ngOnInit(): void {
     this.fetchSearchResults();
@@ -78,6 +81,8 @@ export class ContentSearchComponent implements OnInit{
   }
 
   onBoostChange(): void {
+    this.filter.vectorWeight = (this.hybridBalance / 100) * 2.0;
+    this.filter.bm25Weight = ((100 - this.hybridBalance) / 100) * 2.0;
     this.fetchSearchResults();
   }
 
@@ -86,6 +91,7 @@ export class ContentSearchComponent implements OnInit{
     this.filter.plotBoost = 1.5;
     this.filter.castBoost = 1.0;
     this.filter.genreBoost = 1.0;
+    this.hybridBalance = 75;
     this.fetchSearchResults();
   }
 
@@ -94,6 +100,7 @@ export class ContentSearchComponent implements OnInit{
     this.filter.contentType = '';
     this.filter.genre = '';
     this.filter.minRating = undefined;
+    this.filter.page = 0;
     this.fetchSearchResults();
   }
 
@@ -156,6 +163,7 @@ export class ContentSearchComponent implements OnInit{
       next: (response) => {
         this.contents = response.content || [];
         this.totalResults = response.totalElements || 0;
+        this.totalPages = response.totalPages || 0;
         this.isLoading = false;
         this.cdr.markForCheck();
       },
@@ -168,4 +176,45 @@ export class ContentSearchComponent implements OnInit{
       }
     });
   }
+
+  prevPage(): void {
+    if (this.filter.page && this.filter.page > 0) {
+      this.filter.page--;
+      this.fetchSearchResults();
+      window.scrollTo({ top: 0, behavior: 'smooth' }); // Sayfa değişince en üste kaysın
+    }
+  }
+  nextPage(): void {
+    const currentPage = this.filter.page || 0;
+    if (currentPage < this.totalPages - 1) {
+      this.filter.page = currentPage + 1;
+      this.fetchSearchResults();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+    getPagesArray(): number[] {
+    const maxPagesToShow = 5;
+    const currentPage = this.filter.page || 0;
+    
+    let startPage = Math.max(0, currentPage - 2);
+    let endPage = Math.min(this.totalPages - 1, startPage + maxPagesToShow - 1);
+    
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(0, endPage - maxPagesToShow + 1);
+    }
+    
+    const pages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  goToPage(page: number): void {
+    this.filter.page = page;
+    this.fetchSearchResults();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
 }

@@ -13,6 +13,8 @@ export interface MatchExplanation {
   bm25Score?: number;
   semanticSimilarityScore?: number;
   isSemanticMatch?: boolean;
+  bm25WeightUsed?: number;
+  vectorWeightUsed?: number;
 }
 export interface ContentIndex {
   id: number;
@@ -41,6 +43,8 @@ export interface SearchFilter {
   plotBoost?: number;
   castBoost?: number;
   genreBoost?: number;
+  bm25Weight?: number;
+  vectorWeight?: number;
 }
 
 export interface PageResponse<T> {

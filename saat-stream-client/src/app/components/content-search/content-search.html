@@ -26,11 +26,31 @@
   </div>
 
 
-  <div class="boost-panel" *ngIf="showBoostSettings">
+    <div class="boost-panel" *ngIf="showBoostSettings">
     <div class="boost-header">
       <h4>🎯 Dynamic Field Relevance Multipliers (BM25 Boosts)</h4>
       <button type="button" class="reset-boost-btn" (click)="resetBoosts()">Reset to Default</button>
     </div>
+    
+    <div class="boost-group ai-slider-group" style="grid-column: 1 / -1; margin-bottom: 20px; background: #1f2937; padding: 15px; border-radius: 8px;">
+        
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #6b7280; font-weight: bold;">
+          <span [style.color]="hybridBalance < 50 ? '#3b82f6' : '#6b7280'">🎯 Keyword</span>
+          <span style="background: #3b82f6; color: white; padding: 2px 10px; border-radius: 12px;">{{ hybridBalance }}% AI</span>
+          <span [style.color]="hybridBalance >= 50 ? '#3b82f6' : '#6b7280'">🧠 Semantic</span>
+        </div>
+        
+        <input 
+          type="range" 
+          min="0" 
+          max="100" 
+          step="5"
+          [(ngModel)]="hybridBalance"
+          (change)="onBoostChange()" 
+          style="width: 100%; margin-top: 10px; accent-color: #3b82f6; cursor: pointer;"
+        />
+    </div>
+
     <div class="sliders-grid">
       <div class="slider-item">
         <div class="slider-label">
@@ -63,9 +83,8 @@
         </div>
         <input type="range" min="0.1" max="10" step="0.1" [(ngModel)]="filter.genreBoost" (change)="onBoostChange()" />
       </div>
-    </div>
+    </div>  
   </div>
-
   
   <div class="filters-row">
     
@@ -188,20 +207,29 @@
               <span style="color:#60a5fa; font-weight:bold;">Match Type:</span> 
               <span style="color: #ffffff;">{{ selectedExplainItem.matchExplanation?.decisionSummary }}</span>
             </div>
-            <div style="display: flex; gap: 20px; justify-content: space-between;">
+                        <div style="display: flex; gap: 20px; justify-content: space-between;">
               <div>
                 <span style="color:#8a8d9b; display:block; font-size: 11px;">RRF Score</span> 
                 <strong style="color:#45f3ff;">{{ selectedExplainItem.score | number:'1.2-4' }}</strong>
               </div>
+              
               <div>
                 <span style="color:#8a8d9b; display:block; font-size: 11px;">BM25 (Text)</span> 
                 <strong style="color:#4ade80;">{{ selectedExplainItem.matchExplanation?.bm25Score | number:'1.2-2' }}</strong>
+                <span *ngIf="selectedExplainItem.matchExplanation?.bm25WeightUsed" style="font-size: 10px; color: #4ade80; background: rgba(74, 222, 128, 0.2); padding: 1px 4px; border-radius: 4px; margin-left: 5px;">
+                  x{{ selectedExplainItem.matchExplanation?.bm25WeightUsed | number:'1.1-2' }}
+                </span>
               </div>
+              
               <div>
                 <span style="color:#8a8d9b; display:block; font-size: 11px;">Semantic (Vector)</span> 
                 <strong style="color:#a855f7;">{{ selectedExplainItem.matchExplanation?.semanticSimilarityScore | number:'1.2-4' }}</strong>
+                <span *ngIf="selectedExplainItem.matchExplanation?.vectorWeightUsed" style="font-size: 10px; color: #a855f7; background: rgba(168, 85, 247, 0.2); padding: 1px 4px; border-radius: 4px; margin-left: 5px;">
+                  x{{ selectedExplainItem.matchExplanation?.vectorWeightUsed | number:'1.1-2' }}
+                </span>
               </div>
             </div>
+
           </div>
 
         </div>
@@ -212,24 +240,20 @@
         <div class="section-title">📊 Field Score Contributions</div>
         <div class="score-cards-row">
           <div class="mini-score-box">
-            <span class="box-label">🏷️ Title</span>
-            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.titleScore | number:'1.2-2' }}</strong>
-            <small>{{ filter.titleBoost }}x</small>
+            <span class="box-label">🏷️ Title Weight</span>
+            <strong class="box-val" style="color: #45f3ff;">{{ filter.titleBoost }}x</strong>
           </div>
           <div class="mini-score-box">
-            <span class="box-label">📝 Plot</span>
-            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.plotScore | number:'1.2-2' }}</strong>
-            <small>{{ filter.plotBoost }}x</small>
+            <span class="box-label">📝 Plot Weight</span>
+            <strong class="box-val" style="color: #45f3ff;">{{ filter.plotBoost }}x</strong>
           </div>
           <div class="mini-score-box">
-            <span class="box-label">🎭 Cast</span>
-            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.castScore | number:'1.2-2' }}</strong>
-            <small>{{ filter.castBoost }}x</small>
+            <span class="box-label">🎭 Cast Weight</span>
+            <strong class="box-val" style="color: #45f3ff;">{{ filter.castBoost }}x</strong>
           </div>
           <div class="mini-score-box">
-            <span class="box-label">🎬 Genre</span>
-            <strong class="box-val">{{ selectedExplainItem.matchExplanation?.genreScore | number:'1.2-2' }}</strong>
-            <small>{{ filter.genreBoost }}x</small>
+            <span class="box-label">🎬 Genre Weight</span>
+            <strong class="box-val" style="color: #45f3ff;">{{ filter.genreBoost }}x</strong>
           </div>
         </div>
       </div>
@@ -270,3 +294,33 @@
     </div>
   </div>
 </div>
+
+<!-- ==========================================================================
+     PAGINATION
+     ========================================================================== -->
+<div class="pagination-container" *ngIf="totalPages > 1 && !isLoading">
+  <button 
+    class="page-btn nav-btn" 
+    [disabled]="(filter.page || 0) === 0" 
+    (click)="prevPage()">
+    &laquo; Prev
+  </button>
+
+  <div class="page-numbers">
+    <button 
+      *ngFor="let pageNum of getPagesArray()" 
+      class="page-btn" 
+      [class.active]="(filter.page || 0) === pageNum"
+      (click)="goToPage(pageNum)">
+      {{ pageNum + 1 }}
+    </button>
+  </div>
+
+  <button 
+    class="page-btn nav-btn" 
+    [disabled]="(filter.page || 0) >= totalPages - 1" 
+    (click)="nextPage()">
+    Next &raquo;
+  </button>
+</div>
+

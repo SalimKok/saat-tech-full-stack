@@ -8,7 +8,7 @@ import { ContentIndex, PageResponse, SearchFilter } from '../models/content-inde
 })
 export class ContentSearchService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/contents';
+  private readonly baseUrl = 'http://localhost:8080/api/contentSearch';
 
   search(filter: SearchFilter): Observable<PageResponse<ContentIndex>> {
     let params = new HttpParams()
@@ -43,7 +43,13 @@ export class ContentSearchService {
     if (filter.genreBoost !== undefined) {
       params = params.set('genreBoost', filter.genreBoost.toString());
     }
-
+    
+    if (filter.bm25Weight !== undefined) {
+      params = params.set('bm25Weight', filter.bm25Weight.toString());
+    }
+    if (filter.vectorWeight !== undefined) {
+      params = params.set('vectorWeight', filter.vectorWeight.toString());
+    }
     return this.http.get<PageResponse<ContentIndex>>(`${this.baseUrl}/search`, { params });
   }
 
