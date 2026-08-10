@@ -1,21 +1,19 @@
 package com.saattech.elasticsearch.helper;
+import com.saattech.config.SearchProperties;
 import com.saattech.elasticsearch.dto.MatchExplanationDto;
 import com.saattech.elasticsearch.model.ContentIndex;
-import org.springframework.beans.factory.annotation.Value;
+import com.saattech.specification.dto.ContentFilterDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
+@RequiredArgsConstructor
 public class ReciprocalRankFusionHelper {
-    @Value("${app.search.rrf.k:60}")
-    private int rrfK;
-    @Value("${app.search.rrf.weight.bm25:0.5}")
-    private double bm25Weight;
-    @Value("${app.search.rrf.weight.vector:1.5}")
-    private double vectorWeight;
+    private final SearchProperties searchProperties;
 
-    public List<ContentIndex> fuseResults(List<SearchHit<ContentIndex>> bm25Hits, List<SearchHit<ContentIndex>> vectorHits) {
+    public List<ContentIndex> fuseResults(List<SearchHit<ContentIndex>> bm25Hits, List<SearchHit<ContentIndex>> vectorHits, ContentFilterDto filter) {
         Map<Long, ContentIndex> contentMap = new HashMap<>();
         Map<Long, Double> rrfScores = new HashMap<>();
         Map<Long, Integer> bm25Ranks = new HashMap<>();
@@ -24,6 +22,14 @@ public class ReciprocalRankFusionHelper {
         Map<Long, Map<String, List<String>>> highlightMap = new HashMap<>();
         Map<Long, Float> rawBm25Scores = new HashMap<>();
         Map<Long, Float> rawSemanticScores = new HashMap<>();
+
+        double currentBm25Weight = (filter != null && filter.getBm25Weight() != null)
+                ? filter.getBm25Weight()
+                : searchProperties.getRrf().getWeight().getBm25();
+
+        double currentVectorWeight = (filter != null && filter.getVectorWeight() != null)
+                ? filter.getVectorWeight()
+                : searchProperties.getRrf().getWeight().getVector();
 
         if (bm25Hits != null) {
             for (int rank = 0; rank < bm25Hits.size(); rank++) {
@@ -37,7 +43,7 @@ public class ReciprocalRankFusionHelper {
                 if (hit.getHighlightFields() != null && !hit.getHighlightFields().isEmpty()) {
                     highlightMap.put(id, hit.getHighlightFields());
                 }
-                double score = (1.0 / (rrfK + (rank + 1))) * bm25Weight;
+                double score = (1.0 / (searchProperties.getRrf().getK() + (rank + 1))) * currentBm25Weight;
                 rrfScores.put(id, rrfScores.getOrDefault(id, 0.0) + score);
             }
         }
@@ -50,7 +56,7 @@ public class ReciprocalRankFusionHelper {
                 vectorRanks.put(id, rank + 1);
 
                 if (hit.getScore() > 0) rawSemanticScores.put(id, hit.getScore());
-                double score = (1.0 / (rrfK + (rank + 1))) * vectorWeight;
+                double score = (1.0 / (searchProperties.getRrf().getK() + (rank + 1))) * currentVectorWeight;
                 rrfScores.put(id, rrfScores.getOrDefault(id, 0.0) + score);
             }
         }
@@ -86,6 +92,8 @@ public class ReciprocalRankFusionHelper {
                     .semanticSimilarityScore(sScore.doubleValue())
                     .decisionSummary(summary)
                     .highlightedSnippets(highlights)
+                    .bm25WeightUsed(currentBm25Weight)
+                    .vectorWeightUsed(currentVectorWeight)
                     .build();
 
             content.setMatchExplanation(explanation);

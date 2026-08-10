@@ -1,5 +1,6 @@
 package com.saattech.elasticsearch.service.impl;
 
+import com.saattech.config.SearchProperties;
 import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.elasticsearch.builder.ContentQueryBuilder;
 import com.saattech.elasticsearch.helper.ReciprocalRankFusionHelper;
@@ -12,7 +13,6 @@ import com.saattech.enums.EntityStatus;
 import com.saattech.repository.ContentRepository;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -43,8 +43,8 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     private final ReciprocalRankFusionHelper rrfHelper;
     private final ContentIndexMapper indexMapper;
     private final EmbeddingService embeddingService;
-    @Value("${app.search.rrf.k:60}")
-    private int rrfK;
+
+    private final SearchProperties searchProperties;
 
     @Override
     public Page<ContentIndex> search(String query, ContentFilterDto filter, Pageable pageable) {
@@ -54,7 +54,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             boolean hasText = query != null && !query.trim().isEmpty();
             long[] metrics = new long[4];
 
-            int topK = Math.max(rrfK, (int) pageable.getOffset() + pageable.getPageSize());
+            int topK = Math.max(searchProperties.getRrf().getK(), (int) pageable.getOffset() + pageable.getPageSize());
 
             CompletableFuture<List<SearchHit<ContentIndex>>> bm25Future = CompletableFuture.supplyAsync(() -> {
                 long start = System.currentTimeMillis();
@@ -100,7 +100,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             List<SearchHit<ContentIndex>> bm25Hits = bm25Future.join();
             List<SearchHit<ContentIndex>> vectorHits = vectorFuture.join();
 
-            List<ContentIndex> fusedResults = rrfHelper.fuseResults(bm25Hits, vectorHits);
+            List<ContentIndex> fusedResults = rrfHelper.fuseResults(bm25Hits, vectorHits, filter    );
 
             int start = (int) pageable.getOffset();
             int end = Math.min((start + pageable.getPageSize()), fusedResults.size());

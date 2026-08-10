@@ -1,9 +1,10 @@
 package com.saattech.elasticsearch.builder;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import com.saattech.config.SearchProperties;
 import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.specification.dto.ContentFilterDto;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
@@ -14,19 +15,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ContentQueryBuilder {
-    @Value("${app.search.boost.title:3.0}")
-    private float defaultTitleBoost;
-    @Value("${app.search.boost.plot:1.5}")
-    private float defaultPlotBoost;
-    @Value("${app.search.boost.cast:1.0}")
-    private float defaultCastBoost;
-    @Value("${app.search.boost.genre:1.0}")
-    private float defaultGenreBoost;
-    @Value("${app.search.query.minimum-should-match:2<60%}")
-    private String minimumShouldMatch;
-    @Value("${app.search.knn.candidates:100}")
-    private int knnCandidates;
+    private final SearchProperties searchProperties;
 
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_PLOT = "plot";
@@ -36,10 +27,10 @@ public class ContentQueryBuilder {
     public NativeQuery buildTextQuery(String query, ContentFilterDto filter, int topK) {
 
         BoolQuery.Builder boolQuery = new BoolQuery.Builder();
-        float titleBoost = (filter != null && filter.getTitleBoost() != null && filter.getTitleBoost() > 0) ? filter.getTitleBoost() : defaultTitleBoost;
-        float plotBoost  = (filter != null && filter.getPlotBoost()  != null && filter.getPlotBoost()  > 0) ? filter.getPlotBoost()  : defaultPlotBoost;
-        float castBoost  = (filter != null && filter.getCastBoost()  != null && filter.getCastBoost()  > 0) ? filter.getCastBoost()  : defaultCastBoost;
-        float genreBoost = (filter != null && filter.getGenreBoost() != null && filter.getGenreBoost() > 0) ? filter.getGenreBoost() : defaultGenreBoost;
+        float titleBoost = (filter != null && filter.getTitleBoost() != null && filter.getTitleBoost() > 0) ? filter.getTitleBoost() : searchProperties.getBoost().getTitle();
+        float plotBoost  = (filter != null && filter.getPlotBoost()  != null && filter.getPlotBoost()  > 0) ? filter.getPlotBoost()  : searchProperties.getBoost().getPlot();
+        float castBoost  = (filter != null && filter.getCastBoost()  != null && filter.getCastBoost()  > 0) ? filter.getCastBoost()  : searchProperties.getBoost().getCast();
+        float genreBoost = (filter != null && filter.getGenreBoost() != null && filter.getGenreBoost() > 0) ? filter.getGenreBoost() : searchProperties.getBoost().getGenre();
 
         if (query != null && !query.trim().isEmpty()) {
             String trimmed = query.trim();
@@ -52,9 +43,8 @@ public class ContentQueryBuilder {
             boolQuery.must(m -> m.multiMatch(mm -> mm
                     .query(trimmed)
                     .fields(dynamicFields)
-                    .minimumShouldMatch(minimumShouldMatch)
+                    .minimumShouldMatch(searchProperties.getQuery().getMinimumShouldMatch())
                     .fuzziness("AUTO")
-                    .prefixLength(2)
             ));
         }
         applyFilters(boolQuery, filter);
@@ -72,7 +62,7 @@ public class ContentQueryBuilder {
             boolQuery.must(m -> m.knn(k -> k
                     .field("plotVector")
                     .queryVector(queryVector)
-                    .numCandidates(knnCandidates)
+                    .numCandidates(searchProperties.getKnn().getCandidates())
             ));
         }
         applyFilters(boolQuery, filter);

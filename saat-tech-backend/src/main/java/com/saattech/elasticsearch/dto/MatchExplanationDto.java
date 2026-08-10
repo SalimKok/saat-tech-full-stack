@@ -25,4 +25,7 @@ public class MatchExplanationDto {
     private Double semanticSimilarityScore;
     private String semanticSimilarityPercentage;
     private Boolean isSemanticMatch;
+
+    private Double bm25WeightUsed;
+    private Double vectorWeightUsed;
 }

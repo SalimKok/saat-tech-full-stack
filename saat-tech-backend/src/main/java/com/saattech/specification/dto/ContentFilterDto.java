@@ -16,4 +16,6 @@ public class ContentFilterDto {
     private Float plotBoost;
     private Float castBoost;
     private Float genreBoost;
+    private Double bm25Weight;
+    private Double vectorWeight;
 }
