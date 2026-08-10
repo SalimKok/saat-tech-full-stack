@@ -1,11 +1,20 @@
-package com.saattech.elasticsearch;
+package com.saattech.elasticsearch.helper;
+import com.saattech.elasticsearch.dto.MatchExplanationDto;
+import com.saattech.elasticsearch.model.ContentIndex;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
 public class ReciprocalRankFusionHelper {
-    private static final int RRF_K = 60; //
+    @Value("${app.search.rrf.k:60}")
+    private int rrfK;
+    @Value("${app.search.rrf.weight.bm25:0.5}")
+    private double bm25Weight;
+    @Value("${app.search.rrf.weight.vector:1.5}")
+    private double vectorWeight;
+
     public List<ContentIndex> fuseResults(List<SearchHit<ContentIndex>> bm25Hits, List<SearchHit<ContentIndex>> vectorHits) {
         Map<Long, ContentIndex> contentMap = new HashMap<>();
         Map<Long, Double> rrfScores = new HashMap<>();
@@ -28,7 +37,7 @@ public class ReciprocalRankFusionHelper {
                 if (hit.getHighlightFields() != null && !hit.getHighlightFields().isEmpty()) {
                     highlightMap.put(id, hit.getHighlightFields());
                 }
-                double score = (1.0 / (RRF_K + (rank + 1))) * 0.5;
+                double score = (1.0 / (rrfK + (rank + 1))) * bm25Weight;
                 rrfScores.put(id, rrfScores.getOrDefault(id, 0.0) + score);
             }
         }
@@ -41,7 +50,7 @@ public class ReciprocalRankFusionHelper {
                 vectorRanks.put(id, rank + 1);
 
                 if (hit.getScore() > 0) rawSemanticScores.put(id, hit.getScore());
-                double score = (1.0 / (RRF_K + (rank + 1))) * 1.5;
+                double score = (1.0 / (rrfK + (rank + 1))) * vectorWeight;
                 rrfScores.put(id, rrfScores.getOrDefault(id, 0.0) + score);
             }
         }
@@ -69,12 +78,7 @@ public class ReciprocalRankFusionHelper {
                 summary = String.format("Keyword BM25 Match (#%d)", bm25Rank);
             }
 
-
             Map<String, List<String>> highlights = highlightMap.getOrDefault(id, new HashMap<>());
-            float titlePts = highlights.containsKey("title") ? (float) totalRrf * 0.5f : 0f;
-            float plotPts  = highlights.containsKey("plot") ? (float) totalRrf * 0.35f : 0f;
-            float castPts  = highlights.containsKey("castNames") ? (float) totalRrf * 0.15f : 0f;
-            float genrePts = highlights.containsKey("genre") ? (float) totalRrf * 0.10f : 0f;
 
             MatchExplanationDto explanation = MatchExplanationDto.builder()
                     .totalScore((float) totalRrf)
@@ -82,10 +86,6 @@ public class ReciprocalRankFusionHelper {
                     .semanticSimilarityScore(sScore.doubleValue())
                     .decisionSummary(summary)
                     .highlightedSnippets(highlights)
-                    .titleScore(titlePts)
-                    .plotScore(plotPts)
-                    .castScore(castPts)
-                    .genreScore(genrePts)
                     .build();
 
             content.setMatchExplanation(explanation);

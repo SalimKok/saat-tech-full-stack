@@ -27,6 +27,12 @@ public class OllamaEmbeddingServiceImpl implements EmbeddingService {
     @Value("${app.embedding.model:all-minilm}")
     private String modelName;
 
+    @Value("${app.embedding.timeout.connect:10}")
+    int connectTimeout;
+
+    @Value("${app.embedding.timeout.read:20}")
+    int readTimeout;
+
     @Override
     public List<Float> getEmbedding(String text) {
         if (text == null || text.trim().isEmpty()) {
@@ -35,8 +41,8 @@ public class OllamaEmbeddingServiceImpl implements EmbeddingService {
 
         try {
             RestTemplate restTemplate = restTemplateBuilder
-                    .connectTimeout(Duration.ofSeconds(10))
-                    .readTimeout(Duration.ofSeconds(20))
+                    .connectTimeout(Duration.ofSeconds(connectTimeout))
+                    .readTimeout(Duration.ofSeconds(readTimeout))
                     .build();
 
             Map<String, Object> requestBody = new HashMap<>();

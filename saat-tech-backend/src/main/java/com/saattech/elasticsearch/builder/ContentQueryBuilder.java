@@ -1,7 +1,9 @@
-package com.saattech.elasticsearch;
+package com.saattech.elasticsearch.builder;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.specification.dto.ContentFilterDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
@@ -9,32 +11,48 @@ import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightParameters;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ContentQueryBuilder {
+    @Value("${app.search.boost.title:3.0}")
+    private float defaultTitleBoost;
+    @Value("${app.search.boost.plot:1.5}")
+    private float defaultPlotBoost;
+    @Value("${app.search.boost.cast:1.0}")
+    private float defaultCastBoost;
+    @Value("${app.search.boost.genre:1.0}")
+    private float defaultGenreBoost;
+    @Value("${app.search.query.minimum-should-match:2<60%}")
+    private String minimumShouldMatch;
+    @Value("${app.search.knn.candidates:100}")
+    private int knnCandidates;
+
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_PLOT = "plot";
+    private static final String FIELD_CAST = "castNames";
+    private static final String FIELD_GENRE = "genre";
 
     public NativeQuery buildTextQuery(String query, ContentFilterDto filter, int topK) {
+
         BoolQuery.Builder boolQuery = new BoolQuery.Builder();
-        float titleBoost = (filter != null && filter.getTitleBoost() != null && filter.getTitleBoost() > 0) ? filter.getTitleBoost() : 3.0f;
-        float plotBoost  = (filter != null && filter.getPlotBoost()  != null && filter.getPlotBoost()  > 0) ? filter.getPlotBoost()  : 1.5f;
-        float castBoost  = (filter != null && filter.getCastBoost()  != null && filter.getCastBoost()  > 0) ? filter.getCastBoost()  : 1.0f;
-        float genreBoost = (filter != null && filter.getGenreBoost() != null && filter.getGenreBoost() > 0) ? filter.getGenreBoost() : 1.0f;
+        float titleBoost = (filter != null && filter.getTitleBoost() != null && filter.getTitleBoost() > 0) ? filter.getTitleBoost() : defaultTitleBoost;
+        float plotBoost  = (filter != null && filter.getPlotBoost()  != null && filter.getPlotBoost()  > 0) ? filter.getPlotBoost()  : defaultPlotBoost;
+        float castBoost  = (filter != null && filter.getCastBoost()  != null && filter.getCastBoost()  > 0) ? filter.getCastBoost()  : defaultCastBoost;
+        float genreBoost = (filter != null && filter.getGenreBoost() != null && filter.getGenreBoost() > 0) ? filter.getGenreBoost() : defaultGenreBoost;
 
         if (query != null && !query.trim().isEmpty()) {
             String trimmed = query.trim();
             List<String> dynamicFields = List.of(
-                    "title^" + titleBoost,
-                    "plot^" + plotBoost,
-                    "castNames^" + castBoost,
-                    "genre^" + genreBoost
+                    FIELD_TITLE + "^" + titleBoost,
+                    FIELD_PLOT + "^" + plotBoost,
+                    FIELD_CAST + "^" + castBoost,
+                    FIELD_GENRE + "^" + genreBoost
             );
             boolQuery.must(m -> m.multiMatch(mm -> mm
                     .query(trimmed)
                     .fields(dynamicFields)
-                    .minimumShouldMatch("2<60%")
+                    .minimumShouldMatch(minimumShouldMatch)
                     .fuzziness("AUTO")
                     .prefixLength(2)
             ));
@@ -54,7 +72,7 @@ public class ContentQueryBuilder {
             boolQuery.must(m -> m.knn(k -> k
                     .field("plotVector")
                     .queryVector(queryVector)
-                    .numCandidates(100)
+                    .numCandidates(knnCandidates)
             ));
         }
         applyFilters(boolQuery, filter);

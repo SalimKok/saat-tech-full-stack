@@ -1,6 +1,6 @@
 package com.saattech.controller;
 
-import com.saattech.elasticsearch.ContentIndex;
+import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.elasticsearch.service.ContentSearchService;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/contents")
+@RequestMapping("/api/contentSearch")
 @RequiredArgsConstructor
 public class ContentSearchController {
 
@@ -31,6 +31,6 @@ public class ContentSearchController {
     @PostMapping("/sync-elasticsearch")
     public ResponseEntity<String> syncElasticsearch() {
         contentSearchService.syncAllContents();
-        return ResponseEntity.ok("All contents synchronized to Elasticsearch successfully!");
+        return ResponseEntity.ok().build();
     }
 }

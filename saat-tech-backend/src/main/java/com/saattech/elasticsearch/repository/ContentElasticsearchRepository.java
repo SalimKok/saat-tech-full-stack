@@ -1,6 +1,6 @@
 package com.saattech.elasticsearch.repository;
 
-import com.saattech.elasticsearch.ContentIndex;
+import com.saattech.elasticsearch.model.ContentIndex;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 @Repository

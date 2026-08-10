@@ -1,5 +1,6 @@
-package com.saattech.elasticsearch;
+package com.saattech.elasticsearch.mapper;
 
+import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.elasticsearch.service.EmbeddingService;
 import com.saattech.entity.Content;
 import com.saattech.entity.Metadata;

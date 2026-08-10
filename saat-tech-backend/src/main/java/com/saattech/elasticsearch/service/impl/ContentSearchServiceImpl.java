@@ -1,9 +1,9 @@
 package com.saattech.elasticsearch.service.impl;
 
-import com.saattech.elasticsearch.ContentIndex;
-import com.saattech.elasticsearch.ContentQueryBuilder;
-import com.saattech.elasticsearch.ReciprocalRankFusionHelper;
-import com.saattech.elasticsearch.ContentIndexMapper;
+import com.saattech.elasticsearch.model.ContentIndex;
+import com.saattech.elasticsearch.builder.ContentQueryBuilder;
+import com.saattech.elasticsearch.helper.ReciprocalRankFusionHelper;
+import com.saattech.elasticsearch.mapper.ContentIndexMapper;
 import com.saattech.elasticsearch.repository.ContentElasticsearchRepository;
 import com.saattech.elasticsearch.service.ContentSearchService;
 import com.saattech.elasticsearch.service.EmbeddingService;
@@ -12,6 +12,7 @@ import com.saattech.enums.EntityStatus;
 import com.saattech.repository.ContentRepository;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,6 +43,8 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     private final ReciprocalRankFusionHelper rrfHelper;
     private final ContentIndexMapper indexMapper;
     private final EmbeddingService embeddingService;
+    @Value("${app.search.rrf.k:60}")
+    private int rrfK;
 
     @Override
     public Page<ContentIndex> search(String query, ContentFilterDto filter, Pageable pageable) {
@@ -51,7 +54,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             boolean hasText = query != null && !query.trim().isEmpty();
             long[] metrics = new long[4];
 
-            int topK = Math.max(60, (int) pageable.getOffset() + pageable.getPageSize());
+            int topK = Math.max(rrfK, (int) pageable.getOffset() + pageable.getPageSize());
 
             CompletableFuture<List<SearchHit<ContentIndex>>> bm25Future = CompletableFuture.supplyAsync(() -> {
                 long start = System.currentTimeMillis();

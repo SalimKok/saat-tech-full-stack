@@ -1,4 +1,4 @@
-package com.saattech.elasticsearch;
+package com.saattech.elasticsearch.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,10 +14,6 @@ import java.util.Map;
 @AllArgsConstructor
 public class MatchExplanationDto {
     private Float totalScore;
-    private Float titleScore;
-    private Float plotScore;
-    private Float castScore;
-    private Float genreScore;
     private Float bm25Score;
 
     private List<String> matchedFields;

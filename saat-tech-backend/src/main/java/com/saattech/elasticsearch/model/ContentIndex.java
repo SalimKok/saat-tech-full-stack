@@ -1,5 +1,6 @@
-package com.saattech.elasticsearch;
+package com.saattech.elasticsearch.model;
 
+import com.saattech.elasticsearch.dto.MatchExplanationDto;
 import com.saattech.enums.ContentType;
 import com.saattech.enums.EntityStatus;
 import lombok.AllArgsConstructor;
