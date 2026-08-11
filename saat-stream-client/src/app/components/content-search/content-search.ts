@@ -36,7 +36,7 @@ export class ContentSearchComponent implements OnInit{
     'Adventure'
   ];
 
-  hybridBalance: number = 75;
+  hybridBalance: number = 10;
 
   filter: SearchFilter = {
     query: '',
@@ -91,7 +91,7 @@ export class ContentSearchComponent implements OnInit{
     this.filter.plotBoost = 1.5;
     this.filter.castBoost = 1.0;
     this.filter.genreBoost = 1.0;
-    this.hybridBalance = 75;
+    this.hybridBalance = 10;
     this.fetchSearchResults();
   }
 
@@ -181,7 +181,7 @@ export class ContentSearchComponent implements OnInit{
     if (this.filter.page && this.filter.page > 0) {
       this.filter.page--;
       this.fetchSearchResults();
-      window.scrollTo({ top: 0, behavior: 'smooth' }); // Sayfa değişince en üste kaysın
+      window.scrollTo({ top: 0, behavior: 'smooth' }); 
     }
   }
   nextPage(): void {
