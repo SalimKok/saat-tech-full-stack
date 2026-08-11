@@ -94,6 +94,7 @@ public class ContentQueryBuilder {
         HighlightParameters highlightParameters = HighlightParameters.builder()
                 .withPreTags("<mark class=\"es-highlight\">")
                 .withPostTags("</mark>")
+                .withRequireFieldMatch(false)
                 .build();
 
         return new Highlight(highlightParameters, List.of(

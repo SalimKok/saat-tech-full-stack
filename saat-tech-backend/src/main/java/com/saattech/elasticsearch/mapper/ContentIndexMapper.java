@@ -20,7 +20,8 @@ public class ContentIndexMapper {
     private final EmbeddingService embeddingService;
 
     public ContentIndex toIndex(Content content) {
-        if (content == null) return null;
+        if (content == null)
+            return null;
         Metadata metadata = content.getMetadata();
         List<String> castNames = new ArrayList<>();
         if (content.getCastMembers() != null) {
@@ -35,8 +36,7 @@ public class ContentIndexMapper {
         }
         Integer runtimeMinutes = parseRuntimeMinutes(metadata != null ? metadata.getRuntime() : null);
 
-
-        List<Float> plotVector = Collections.emptyList();
+        List<Float> plotVector = null;
         if (metadata != null && metadata.getPlot() != null && !metadata.getPlot().trim().isEmpty()) {
             try {
                 plotVector = embeddingService.getEmbedding(metadata.getPlot());
@@ -62,8 +62,10 @@ public class ContentIndexMapper {
                 .plotVector(plotVector)
                 .build();
     }
+
     private Integer parseRuntimeMinutes(String runtime) {
-        if (runtime == null || runtime.trim().isEmpty()) return null;
+        if (runtime == null || runtime.trim().isEmpty())
+            return null;
         try {
             String digitsOnly = runtime.replaceAll("[^0-9]", "");
             return digitsOnly.isEmpty() ? null : Integer.parseInt(digitsOnly);

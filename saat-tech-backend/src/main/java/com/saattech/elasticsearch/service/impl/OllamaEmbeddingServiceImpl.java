@@ -1,16 +1,16 @@
 package com.saattech.elasticsearch.service.impl;
 
+import com.saattech.config.EmbeddingProperties;
+import com.saattech.config.OllamaProperties;
 import com.saattech.elasticsearch.service.EmbeddingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.context.event.EventListener;
-
 import java.time.Duration;
 import java.util.*;
 
@@ -20,18 +20,8 @@ import java.util.*;
 public class OllamaEmbeddingServiceImpl implements EmbeddingService {
 
     private final RestTemplateBuilder restTemplateBuilder;
-
-    @Value("${app.embedding.url:http://localhost:11434}")
-    private String ollamaUrl;
-
-    @Value("${app.embedding.model:all-minilm}")
-    private String modelName;
-
-    @Value("${app.embedding.timeout.connect:10}")
-    int connectTimeout;
-
-    @Value("${app.embedding.timeout.read:20}")
-    int readTimeout;
+    private final OllamaProperties ollamaProperties;
+    private final EmbeddingProperties embeddingProperties;
 
     @Override
     public List<Float> getEmbedding(String text) {
@@ -41,12 +31,12 @@ public class OllamaEmbeddingServiceImpl implements EmbeddingService {
 
         try {
             RestTemplate restTemplate = restTemplateBuilder
-                    .connectTimeout(Duration.ofSeconds(connectTimeout))
-                    .readTimeout(Duration.ofSeconds(readTimeout))
+                    .connectTimeout(Duration.ofSeconds(ollamaProperties.getTimeout().getConnect()))
+                    .readTimeout(Duration.ofSeconds(ollamaProperties.getTimeout().getRead()))
                     .build();
 
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("model", modelName);
+            requestBody.put("model", embeddingProperties.getModel());
             requestBody.put("prompt", text);
 
             HttpHeaders headers = new HttpHeaders();
@@ -54,7 +44,7 @@ public class OllamaEmbeddingServiceImpl implements EmbeddingService {
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-            String endpoint = ollamaUrl + "/api/embeddings";
+            String endpoint = ollamaProperties.getUrl() + "/api/embeddings";
             ResponseEntity<Map> response = restTemplate.postForEntity(endpoint, entity, Map.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {

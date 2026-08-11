@@ -8,6 +8,7 @@ import com.saattech.elasticsearch.mapper.ContentIndexMapper;
 import com.saattech.elasticsearch.repository.ContentElasticsearchRepository;
 import com.saattech.elasticsearch.service.ContentSearchService;
 import com.saattech.elasticsearch.service.EmbeddingService;
+import com.saattech.elasticsearch.service.QueryExpansionService;
 import com.saattech.entity.Content;
 import com.saattech.enums.EntityStatus;
 import com.saattech.repository.ContentRepository;
@@ -45,13 +46,21 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     private final EmbeddingService embeddingService;
 
     private final SearchProperties searchProperties;
+    private final QueryExpansionService queryExpansionService;
 
     @Override
     public Page<ContentIndex> search(String query, ContentFilterDto filter, Pageable pageable) {
         log.info("================== ASYNC RRF HYBRID SEARCH START ==================");
         long overallStartTime = System.currentTimeMillis();
+
+        long ragStartTime = System.currentTimeMillis();
+        final String finalQuery = queryExpansionService.needsExpansion(query)
+                ? queryExpansionService.expand(query)
+                : query;
+        long ragTookMs = System.currentTimeMillis() - ragStartTime;
+
         try {
-            boolean hasText = query != null && !query.trim().isEmpty();
+            boolean hasText = finalQuery != null && !query.trim().isEmpty();
             long[] metrics = new long[4];
 
             int topK = Math.max(searchProperties.getRrf().getK(), (int) pageable.getOffset() + pageable.getPageSize());
@@ -59,7 +68,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             CompletableFuture<List<SearchHit<ContentIndex>>> bm25Future = CompletableFuture.supplyAsync(() -> {
                 long start = System.currentTimeMillis();
                 try {
-                    NativeQuery textQuery = queryBuilder.buildTextQuery(query, filter, topK);
+                    NativeQuery textQuery = queryBuilder.buildTextQuery(finalQuery, filter, topK);
                     SearchHits<ContentIndex> hits = elasticsearchOperations.search(textQuery, ContentIndex.class);
                     metrics[0] = System.currentTimeMillis() - start;
                     return hits.getSearchHits();
@@ -78,7 +87,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
                 try {
 
                     long modelStart = System.currentTimeMillis();
-                    List<Float> vector = embeddingService.getEmbedding(query.trim());
+                    List<Float> vector = embeddingService.getEmbedding(finalQuery.trim());
                     metrics[1] = System.currentTimeMillis() - modelStart;
                     if (vector != null && !vector.isEmpty()) {
 
@@ -100,7 +109,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             List<SearchHit<ContentIndex>> bm25Hits = bm25Future.join();
             List<SearchHit<ContentIndex>> vectorHits = vectorFuture.join();
 
-            List<ContentIndex> fusedResults = rrfHelper.fuseResults(bm25Hits, vectorHits, filter    );
+            List<ContentIndex> fusedResults = rrfHelper.fuseResults(bm25Hits, vectorHits, filter);
 
             int start = (int) pageable.getOffset();
             int end = Math.min((start + pageable.getPageSize()), fusedResults.size());
@@ -110,8 +119,8 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             long totalTookMs = System.currentTimeMillis() - overallStartTime;
 
             log.info(
-                    "==> [PERFORMANCE REPORT] Total: {} ms | BM25: {} ms | Vector Branch: {} ms (Model: {} ms, ES KNN: {} ms) | Fused Unique Items: {}",
-                    totalTookMs, metrics[0], metrics[3], metrics[1], metrics[2], fusedResults.size());
+                    "==> [PERFORMANCE REPORT] Total: {} ms | LLM (RAG): {} ms | BM25: {} ms | Vector Branch: {} ms (Model: {} ms, ES KNN: {} ms) | Fused Unique Items: {}",
+                    totalTookMs, ragTookMs, metrics[0], metrics[3], metrics[1], metrics[2], fusedResults.size());
             return new PageImpl<>(pageContent, pageable, fusedResults.size());
         } catch (NoSuchIndexException e) {
             log.warn("==> [WARN] Index not found, syncing database to Elasticsearch...");
