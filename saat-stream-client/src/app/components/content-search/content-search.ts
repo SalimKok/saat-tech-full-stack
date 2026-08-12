@@ -36,7 +36,7 @@ export class ContentSearchComponent implements OnInit{
     'Adventure'
   ];
 
-  hybridBalance: number = 10;
+  hybridBalance: number = 50;
 
   filter: SearchFilter = {
     query: '',
@@ -91,7 +91,7 @@ export class ContentSearchComponent implements OnInit{
     this.filter.plotBoost = 1.5;
     this.filter.castBoost = 1.0;
     this.filter.genreBoost = 1.0;
-    this.hybridBalance = 10;
+    this.hybridBalance = 50;
     this.fetchSearchResults();
   }
 
