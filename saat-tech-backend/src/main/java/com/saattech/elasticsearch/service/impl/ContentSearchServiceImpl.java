@@ -54,13 +54,20 @@ public class ContentSearchServiceImpl implements ContentSearchService {
         long overallStartTime = System.currentTimeMillis();
 
         long ragStartTime = System.currentTimeMillis();
-        final String finalQuery = queryExpansionService.needsExpansion(query)
-                ? queryExpansionService.expand(query)
-                : query;
+        String expandedQuery = "";
+        if (queryExpansionService.needsExpansion(query)) {
+            String expanded = queryExpansionService.expand(query);
+            if (expanded != null && !expanded.equals(query)) {
+                expandedQuery = expanded;
+            }
+        }
         long ragTookMs = System.currentTimeMillis() - ragStartTime;
 
+        final String bm25QueryStr = expandedQuery.isEmpty() ? query : query + " " + expandedQuery;
+        final String vectorQueryStr = query;
+
         try {
-            boolean hasText = finalQuery != null && !query.trim().isEmpty();
+            boolean hasText = query != null && !query.trim().isEmpty();
             long[] metrics = new long[4];
 
             int topK = Math.max(searchProperties.getRrf().getK(), (int) pageable.getOffset() + pageable.getPageSize());
@@ -68,7 +75,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
             CompletableFuture<List<SearchHit<ContentIndex>>> bm25Future = CompletableFuture.supplyAsync(() -> {
                 long start = System.currentTimeMillis();
                 try {
-                    NativeQuery textQuery = queryBuilder.buildTextQuery(finalQuery, filter, topK);
+                    NativeQuery textQuery = queryBuilder.buildTextQuery(bm25QueryStr, filter, topK);
                     SearchHits<ContentIndex> hits = elasticsearchOperations.search(textQuery, ContentIndex.class);
                     metrics[0] = System.currentTimeMillis() - start;
                     return hits.getSearchHits();
@@ -87,7 +94,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
                 try {
 
                     long modelStart = System.currentTimeMillis();
-                    List<Float> vector = embeddingService.getEmbedding(finalQuery.trim());
+                    List<Float> vector = embeddingService.getEmbedding(vectorQueryStr.trim());
                     metrics[1] = System.currentTimeMillis() - modelStart;
                     if (vector != null && !vector.isEmpty()) {
 
