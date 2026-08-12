@@ -9,6 +9,12 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "app.search")
 public class SearchProperties {
 
+    private Expansion expansion = new Expansion();
+    @Data
+    public static class Expansion {
+        private int minWord = 3;
+    }
+
     private Rrf rrf = new Rrf();
     private Boost boost = new Boost();
     private Query query = new Query();

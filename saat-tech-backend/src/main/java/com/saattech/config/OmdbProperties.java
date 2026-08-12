@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
-public class ConfigValues {
+public class OmdbProperties {
     @Value("${omdb.api.url}")
     private String apiUrl;
     @Value("${omdb.api.key}")

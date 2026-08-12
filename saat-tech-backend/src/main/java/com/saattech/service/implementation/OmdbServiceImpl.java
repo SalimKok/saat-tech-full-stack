@@ -1,6 +1,6 @@
 package com.saattech.service.implementation;
 
-import com.saattech.config.ConfigValues;
+import com.saattech.config.OmdbProperties;
 import com.saattech.dto.omdb.OmdbResponseDto;
 import com.saattech.dto.request.CastRequestDto;
 import com.saattech.dto.request.ContentCastRequestDto;
@@ -27,7 +27,7 @@ public class OmdbServiceImpl implements OmdbService {
 
     private final RestTemplate restTemplate;
     private final OmdbMapper omdbMapper;
-    private final ConfigValues configValues;
+    private final OmdbProperties configValues;
     private final CastService castService;
     private final ContentService contentService;
 
