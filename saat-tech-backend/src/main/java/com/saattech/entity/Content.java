@@ -1,7 +1,7 @@
 package com.saattech.entity;
 
+import com.saattech.enums.ContentStatus;
 import com.saattech.enums.ContentType;
-import com.saattech.enums.EntityStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +27,7 @@ public class Content {
     private ContentType contentType;
 
     @Enumerated(EnumType.STRING)
-    private EntityStatus status = EntityStatus.ACTIVE;
+    private ContentStatus status = ContentStatus.UNPUBLISHED;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -51,5 +51,10 @@ public class Content {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<ContentCast> castMembers;
+
+    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<License> licenses;
 
 }

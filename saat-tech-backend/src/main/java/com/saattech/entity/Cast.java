@@ -1,6 +1,6 @@
 package com.saattech.entity;
 
-import com.saattech.enums.EntityStatus;
+import com.saattech.enums.CastStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.DynamicUpdate;
 import lombok.Data;
@@ -18,6 +18,6 @@ public class Cast {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    private EntityStatus status = EntityStatus.ACTIVE;
+    private CastStatus status = CastStatus.ACTIVE;
 
 }

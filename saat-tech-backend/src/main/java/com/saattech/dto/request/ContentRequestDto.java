@@ -27,4 +27,7 @@ public class ContentRequestDto {
     @Valid
     @NotNull(message = "Metadata cannot be left blank.")
     private MetadataRequestDto metadata;
+
+    @Valid
+    private List<LicenseRequestDto> licenses;
 }

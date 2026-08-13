@@ -1,7 +1,7 @@
 package com.saattech.specification.builder;
 
 import com.saattech.entity.Content;
-import com.saattech.enums.EntityStatus;
+import com.saattech.enums.ContentStatus;
 import com.saattech.specification.dto.ContentFilterDto;
 import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ public class ContentSpecificationBuilder {
             if (filter.getStatus() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), filter.getStatus()));
             } else {
-                predicates.add(criteriaBuilder.equal(root.get("status"), EntityStatus.ACTIVE));
+                predicates.add(criteriaBuilder.notEqual(root.get("status"), ContentStatus.DELETED));
             }
 
             if (filter.getTitle() != null && !filter.getTitle().trim().isEmpty()) {

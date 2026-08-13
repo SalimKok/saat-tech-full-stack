@@ -1,8 +1,8 @@
 package com.saattech.elasticsearch.model;
 
 import com.saattech.elasticsearch.dto.MatchExplanationDto;
+import com.saattech.enums.ContentStatus;
 import com.saattech.enums.ContentType;
-import com.saattech.enums.EntityStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,7 +42,7 @@ public class ContentIndex {
     private ContentType contentType;
 
     @Field(type = FieldType.Keyword)
-    private EntityStatus status;
+    private ContentStatus status;
 
 
     @Field(type = FieldType.Double)

@@ -16,4 +16,5 @@ public class ContentResponseDto {
     private List<ContentResponseDto> subContents;
     private List<ContentCastResponseDto> casts;
     private MetadataResponseDto metadata;
+    private List<LicenseResponseDto> licenses;
 }

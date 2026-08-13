@@ -1,8 +1,8 @@
 package com.saattech.repository;
 
 import com.saattech.entity.Content;
+import com.saattech.enums.ContentStatus;
 import com.saattech.enums.ContentType;
-import com.saattech.enums.EntityStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -13,7 +13,9 @@ public interface ContentRepository extends JpaRepository<Content, Long>, JpaSpec
 
     Optional<Content> findByMetadata_ImdbID(String imdbID);
 
-    Optional<Content> findByIdAndStatus(Long id, EntityStatus status);
+    Optional<Content> findByIdAndStatus(Long id, ContentStatus status);
+
+    Optional<Content> findByIdAndStatusNot(Long id, ContentStatus status);
 
     Optional<Content> findByParentContent_IdAndContentTypeAndSeasonNo(Long parentId, ContentType contentType, Integer seasonNo);
 

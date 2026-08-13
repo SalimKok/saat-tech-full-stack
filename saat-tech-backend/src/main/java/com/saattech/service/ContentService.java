@@ -24,4 +24,6 @@ public interface ContentService {
 
     ContentResponseDto getContentById(Long id);
 
+    ContentResponseDto changeContentStatus(Long id, com.saattech.enums.ContentStatus newStatus);
+
 }

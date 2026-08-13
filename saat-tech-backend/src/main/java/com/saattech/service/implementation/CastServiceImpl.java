@@ -3,7 +3,7 @@ package com.saattech.service.implementation;
 import com.saattech.dto.request.CastRequestDto;
 import com.saattech.dto.response.CastResponseDto;
 import com.saattech.entity.Cast;
-import com.saattech.enums.EntityStatus;
+import com.saattech.enums.CastStatus;
 import com.saattech.mapper.CastMapper;
 import com.saattech.repository.CastRepository;
 import com.saattech.exception.ResourceNotFoundException;
@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +34,9 @@ public class CastServiceImpl implements CastService {
         }
         Page<Cast> castPage;
         if (name != null && !name.trim().isEmpty()) {
-            castPage = castRepository.findByNameContainingIgnoreCaseAndStatus(name.trim(), EntityStatus.ACTIVE, pageable);
+            castPage = castRepository.findByNameContainingIgnoreCaseAndStatus(name.trim(), CastStatus.ACTIVE, pageable);
         } else {
-            castPage = castRepository.findByStatus(EntityStatus.ACTIVE, pageable);
+            castPage = castRepository.findByStatus(CastStatus.ACTIVE, pageable);
         }
         return castPage.map(castMapper::toDto);
     }
@@ -60,7 +58,7 @@ public class CastServiceImpl implements CastService {
         Cast cast = castRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No cast found to delete! ID: " + id));
 
-        cast.setStatus(EntityStatus.DELETED);
+        cast.setStatus(CastStatus.DELETED);
         castRepository.save(cast);
     }
 

@@ -3,11 +3,12 @@ package com.saattech.mapper;
 import com.saattech.dto.request.ContentRequestDto;
 import com.saattech.dto.response.ContentCastResponseDto;
 import com.saattech.dto.response.ContentResponseDto;
+import com.saattech.dto.response.LicenseResponseDto;
 import com.saattech.entity.Cast;
 import com.saattech.entity.Content;
 import com.saattech.entity.ContentCast;
 import com.saattech.enums.CastType;
-import com.saattech.enums.EntityStatus;
+import com.saattech.enums.ContentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -19,8 +20,9 @@ public class ContentMapper {
 
     private final CastMapper castMapper;
     private final MetadataMapper metadataMapper;
+    private final LicenseMapper licenseMapper;
 
-    public ContentResponseDto toDto(Content content){
+    public ContentResponseDto toDto(Content content) {
         if (content == null) {
             return null;
         }
@@ -36,9 +38,9 @@ public class ContentMapper {
             dto.setMetadata(metadataMapper.toDto(content.getMetadata()));
         }
 
-        if (content.getSubContents() != null && !content.getSubContents().isEmpty()){
+        if (content.getSubContents() != null && !content.getSubContents().isEmpty()) {
             List<ContentResponseDto> subDtoList = content.getSubContents().stream()
-                    .filter(child -> child.getStatus() == EntityStatus.ACTIVE)
+                    .filter(child -> child.getStatus()  != ContentStatus.DELETED)
                     .map(this::toDto)
                     .collect(Collectors.toList());
 
@@ -58,10 +60,18 @@ public class ContentMapper {
 
             dto.setCasts(contentCastDtoList);
         }
+
+        if (content.getLicenses() != null && !content.getLicenses().isEmpty()) {
+            List<LicenseResponseDto> licenseDtoList = content.getLicenses().stream()
+                    .map(licenseMapper::toDto)
+                    .collect(Collectors.toList());
+            dto.setLicenses(licenseDtoList);
+        }
+
         return dto;
     }
 
-    public Content toEntity(ContentRequestDto requestDto){
+    public Content toEntity(ContentRequestDto requestDto) {
         if (requestDto == null) {
             return null;
         }
@@ -75,16 +85,21 @@ public class ContentMapper {
     }
 
     public void updateEntityFromDto(ContentRequestDto dto, Content content) {
-        if (dto == null || content == null) return;
+        if (dto == null || content == null)
+            return;
 
-        if (dto.getSeasonNo() != null) content.setSeasonNo(dto.getSeasonNo());
-        if (dto.getEpisodeNo() != null) content.setEpisodeNo(dto.getEpisodeNo());
-        if (dto.getContentType() != null) content.setContentType(dto.getContentType());
+        if (dto.getSeasonNo() != null)
+            content.setSeasonNo(dto.getSeasonNo());
+        if (dto.getEpisodeNo() != null)
+            content.setEpisodeNo(dto.getEpisodeNo());
+        if (dto.getContentType() != null)
+            content.setContentType(dto.getContentType());
 
     }
 
     public ContentCast toContentCast(Content content, Cast cast, CastType role) {
-        if (content == null || cast == null || role == null) return null;
+        if (content == null || cast == null || role == null)
+            return null;
 
         ContentCast contentCast = new ContentCast();
         contentCast.setContent(content);

@@ -64,4 +64,13 @@ public class ContentController {
         ContentResponseDto updatedContent = contentService.updateContent(id, requestDto, updateChildren);
         return ResponseEntity.ok(updatedContent);
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ContentResponseDto> changeStatus(
+            @PathVariable Long id,
+            @RequestParam com.saattech.enums.ContentStatus status) {
+
+        ContentResponseDto updatedContent = contentService.changeContentStatus(id, status);
+        return ResponseEntity.ok(updatedContent);
+    }
 }

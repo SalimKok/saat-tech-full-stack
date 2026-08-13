@@ -10,7 +10,7 @@ import com.saattech.elasticsearch.service.ContentSearchService;
 import com.saattech.elasticsearch.service.EmbeddingService;
 import com.saattech.elasticsearch.service.QueryExpansionService;
 import com.saattech.entity.Content;
-import com.saattech.enums.EntityStatus;
+import com.saattech.enums.ContentStatus;
 import com.saattech.repository.ContentRepository;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;
@@ -143,7 +143,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     public void indexContent(Content content) {
         if (content == null)
             return;
-        if (content.getStatus() == EntityStatus.DELETED) {
+        if (content.getStatus() == ContentStatus.DELETED) {
             deleteContentIndex(content.getId());
             return;
         }
@@ -171,7 +171,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     public void syncAllContents() {
         log.info("Starting bulk synchronization from PostgreSQL to Elasticsearch...");
         List<ContentIndex> indices = contentRepository.findAll().stream()
-                .filter(c -> c.getStatus() == EntityStatus.ACTIVE)
+                .filter(c -> c.getStatus() != ContentStatus.DELETED)
                 .map(indexMapper::toIndex)
                 .collect(Collectors.toList());
 

@@ -10,8 +10,9 @@ import com.saattech.entity.Content;
 import com.saattech.entity.ContentCast;
 import com.saattech.entity.Metadata;
 import com.saattech.enums.CastType;
+import com.saattech.enums.ContentStatus;
 import com.saattech.enums.ContentType;
-import com.saattech.enums.EntityStatus;
+import com.saattech.enums.LicenseStatus;
 import com.saattech.exception.DuplicateResourceException;
 import com.saattech.mapper.ContentMapper;
 import com.saattech.repository.CastRepository;
@@ -62,7 +63,7 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     public ContentResponseDto getContentById(Long id) {
-        Content content = contentRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+        Content content = contentRepository.findByIdAndStatusNot(id, ContentStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + id));
 
         return contentMapper.toDto(content);
@@ -98,10 +99,11 @@ public class ContentServiceImpl implements ContentService {
 
         Content parent = null;
         if (requestDto.getParentId() != null) {
-            parent = contentRepository.findByIdAndStatus(requestDto.getParentId(), EntityStatus.ACTIVE)
+            parent = contentRepository.findByIdAndStatusNot(requestDto.getParentId(), ContentStatus.DELETED)
                     .orElseThrow(() -> new ResourceNotFoundException("Parent content not found! ID: " + requestDto.getParentId()));
         }
         Content content = createContentRecursively(requestDto, parent);
+        validatePublishStatus(content);
         Content savedContent = contentRepository.save(content);
 
         contentSearchService.indexContent(savedContent);
@@ -109,12 +111,12 @@ public class ContentServiceImpl implements ContentService {
     }
 
     private ContentResponseDto handleExistingContent(Content existingContent, ContentRequestDto requestDto, String activeErrorMessage) {
-        if (existingContent.getStatus() == EntityStatus.ACTIVE) {
+        if (existingContent.getStatus() == ContentStatus.DELETED) {
             throw new DuplicateResourceException(activeErrorMessage);
         }
 
-        if (existingContent.getStatus() == EntityStatus.DELETED) {
-            existingContent.setStatus(EntityStatus.ACTIVE);
+        if (existingContent.getStatus() == ContentStatus.DELETED) {
+            existingContent.setStatus(ContentStatus.DELETED);
 
             if (requestDto.getMetadata() != null) {
                 metadataService.updateMetadata(existingContent.getMetadata(), requestDto.getMetadata());
@@ -131,7 +133,7 @@ public class ContentServiceImpl implements ContentService {
     @Transactional
     @Override
     public void deleteContent(Long id){
-        Content content = contentRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+        Content content = contentRepository.findByIdAndStatusNot(id, ContentStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Content to delete not found! ID: " + id));
         softDeleteRecursively(content);
 
@@ -139,7 +141,7 @@ public class ContentServiceImpl implements ContentService {
     }
 
     private void softDeleteRecursively(Content content) {
-        content.setStatus(EntityStatus.DELETED);
+        content.setStatus(ContentStatus.DELETED);
         if (content.getSubContents() != null) {
             for (Content child : content.getSubContents()) {
                 softDeleteRecursively(child);
@@ -151,7 +153,7 @@ public class ContentServiceImpl implements ContentService {
     @Transactional
     @Override
     public void addCastToContent(Long contentId, Long castId, CastType role) {
-        Content content = contentRepository.findByIdAndStatus(contentId, EntityStatus.ACTIVE)
+        Content content = contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found!"));
         Cast cast = castRepository.findById(castId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cast not found!"));
@@ -168,7 +170,7 @@ public class ContentServiceImpl implements ContentService {
     @Transactional
     @Override
     public void removeCastFromContent(Long contentId, Long castId) {
-        Content content = contentRepository.findByIdAndStatus(contentId, EntityStatus.ACTIVE)
+        Content content = contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found!"));
 
         content.getCastMembers().removeIf(cc -> cc.getCast().getId().equals(castId));
@@ -217,7 +219,7 @@ public class ContentServiceImpl implements ContentService {
             childMetaDto.setTitle(null);
         }
         for (Content child : parent.getSubContents()) {
-            if (child.getStatus() == EntityStatus.ACTIVE) {
+            if (child.getStatus() == ContentStatus.DELETED) {
 
                 if (childMetaDto != null) {
                     if (child.getMetadata() == null) {
@@ -244,11 +246,11 @@ public class ContentServiceImpl implements ContentService {
     @Transactional
     @Override
     public ContentResponseDto updateContent(Long id, ContentRequestDto requestDto, boolean updateChildren) {
-        Content content = contentRepository.findByIdAndStatus(id, EntityStatus.ACTIVE)
+        Content content = contentRepository.findByIdAndStatusNot(id, ContentStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + id));
         contentMapper.updateEntityFromDto(requestDto, content);
         if (requestDto.getParentId() != null) {
-            Content parent = contentRepository.findByIdAndStatus(requestDto.getParentId(), EntityStatus.ACTIVE)
+            Content parent = contentRepository.findByIdAndStatusNot(requestDto.getParentId(), ContentStatus.DELETED)
                     .orElseThrow(() -> new ResourceNotFoundException("Parent content not found! ID: " + requestDto.getParentId()));
             content.setParentContent(parent);
         }
@@ -273,9 +275,39 @@ public class ContentServiceImpl implements ContentService {
         if (updateChildren) {
             updateChildrenRecursively(content, requestDto);
         }
-        // ----------------------------------------------------------------------
+
+        validatePublishStatus(content);
         Content savedContent = contentRepository.save(content);
-        // 🔄 Güncellenen içeriği Elasticsearch'te de güncelle
+        contentSearchService.indexContent(savedContent);
+        return contentMapper.toDto(savedContent);
+    }
+
+    private void validatePublishStatus(Content content) {
+        if (content.getStatus() == ContentStatus.PUBLISHED) {
+            boolean hasActiveLicense = false;
+            if (content.getLicenses() != null && !content.getLicenses().isEmpty()) {
+                hasActiveLicense = content.getLicenses().stream()
+                        .anyMatch(license -> license.getStatus() == LicenseStatus.ACTIVE);
+            }
+            if (!hasActiveLicense) {
+                throw new IllegalStateException("Content cannot be PUBLISHED because it has no ACTIVE licenses!");
+            }
+        }
+    }
+
+    @Transactional
+    @Override
+    public ContentResponseDto changeContentStatus(Long id, ContentStatus newStatus) {
+        Content content = contentRepository.findByIdAndStatusNot(id, ContentStatus.DELETED)
+                .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + id));
+
+        if (newStatus == ContentStatus.PUBLISHED) {
+            content.setStatus(ContentStatus.PUBLISHED);
+            validatePublishStatus(content);
+        } else {
+            content.setStatus(newStatus);
+        }
+        Content savedContent = contentRepository.save(content);
         contentSearchService.indexContent(savedContent);
         return contentMapper.toDto(savedContent);
     }
