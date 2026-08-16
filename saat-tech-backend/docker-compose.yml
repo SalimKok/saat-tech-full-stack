@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: saat-tech-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: saat_teknoloji_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - saat-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    container_name: saat-tech-elastic
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    networks:
+      - saat-network
+
+  backend:
+    build: .
+    container_name: saat-tech-backend
+    depends_on:
+      - postgres
+      - elasticsearch
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/saat_teknoloji_db
+      - DB_USER=postgres
+      - DB_PASSWORD=mysecretpassword
+      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - OMDB_API_KEY=senin_omdb_keyin_buraya
+    ports:
+      - "8080:8080"
+    networks:
+      - saat-network
+
+volumes:
+  postgres_data:
+  elastic_data:
+
+networks:
+  saat-network:
+    driver: bridge

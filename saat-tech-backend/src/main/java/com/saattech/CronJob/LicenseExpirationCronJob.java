@@ -1,4 +1,4 @@
-package com.saattech.scheduler;
+package com.saattech.CronJob;
 
 import com.saattech.service.LicenseService;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class LicenseExpirationScheduler {
+public class LicenseExpirationCronJob {
     private final LicenseService licenseService;
 
-    @Scheduled(cron = "0 41 17 * * ?")
+    @Scheduled(cron = "${jobs.cron.license-expiration}")
     public void runLicenseExpirationJob() {
         log.info("====== CRONJOB STARTED ======");
         try {

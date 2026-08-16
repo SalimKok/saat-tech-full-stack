@@ -143,7 +143,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     public void indexContent(Content content) {
         if (content == null)
             return;
-        if (content.getStatus() == ContentStatus.DELETED) {
+        if (content.getStatus() != ContentStatus.PUBLISHED) {
             deleteContentIndex(content.getId());
             return;
         }
@@ -171,7 +171,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     public void syncAllContents() {
         log.info("Starting bulk synchronization from PostgreSQL to Elasticsearch...");
         List<ContentIndex> indices = contentRepository.findAll().stream()
-                .filter(c -> c.getStatus() != ContentStatus.DELETED)
+                .filter(c -> c.getStatus() != ContentStatus.PUBLISHED)
                 .map(indexMapper::toIndex)
                 .collect(Collectors.toList());
 

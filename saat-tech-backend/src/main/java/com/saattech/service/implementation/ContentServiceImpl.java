@@ -19,6 +19,7 @@ import com.saattech.repository.CastRepository;
 import com.saattech.repository.ContentRepository;
 import com.saattech.exception.ResourceNotFoundException;
 import com.saattech.service.ContentService;
+import com.saattech.service.LicenseService;
 import com.saattech.service.MetadataService;
 import com.saattech.specification.builder.ContentSpecificationBuilder;
 import com.saattech.specification.dto.ContentFilterDto;
@@ -43,6 +44,7 @@ public class ContentServiceImpl implements ContentService {
     private final CastRepository castRepository;
     private final MetadataService metadataService;
     private final ContentSearchService contentSearchService;
+    private final LicenseService licenseService;
 
     @Override
     public Page<ContentResponseDto> getAllContents(ContentFilterDto filterDto, Pageable pageable) {
@@ -61,10 +63,12 @@ public class ContentServiceImpl implements ContentService {
         return contentPage.map(contentMapper::toDto);
     }
 
+
     @Override
     public ContentResponseDto getContentById(Long id) {
         Content content = contentRepository.findByIdAndStatusNot(id, ContentStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + id));
+
 
         return contentMapper.toDto(content);
     }
