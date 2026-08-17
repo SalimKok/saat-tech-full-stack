@@ -78,7 +78,9 @@
         id="filterStatus" 
         [(ngModel)]="filter.status" 
         (ngModelChange)="onSearch()">
-        <option value="ACTIVE">ACTIVE</option>
+        <option value="UNPUBLISHED">UNPUBLISHED</option>
+        <option value="PUBLISHED">PUBLISHED</option>
+        <option value="NO_ACTIVE_LICENSE">NO_ACTIVE_LICENSE</option>
         <option value="DELETED">DELETED</option>
       </select>
     </div>

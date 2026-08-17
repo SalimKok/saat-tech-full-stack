@@ -16,7 +16,7 @@ export class ContentFilter {
   filter: ContentFilterDto = {
     title: '',
     contentType: '',
-    status: 'ACTIVE',
+    status: 'PUBLISHED',
     genre: '',
     minRating: null,
     year: null
@@ -30,7 +30,7 @@ export class ContentFilter {
     this.filter = {
       title: '',
       contentType: '',
-      status: 'ACTIVE',
+      status: 'PUBLISHED',
       genre: '',
       minRating: null,
       year: null
@@ -42,7 +42,7 @@ export class ContentFilter {
     return !!(
       this.filter.title?.trim() ||
       this.filter.contentType ||
-      this.filter.status !== 'ACTIVE' ||
+      this.filter.status !== 'PUBLISHED' ||
       this.filter.genre?.trim() ||
       (this.filter.minRating && this.filter.minRating > 0) ||
       (this.filter.year && this.filter.year > 0)

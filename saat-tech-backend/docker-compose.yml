@@ -46,6 +46,19 @@ services:
     networks:
       - saat-network
 
+
+  nginx-frontends:
+    build:
+      context: ../
+      dockerfile: Dockerfile.frontends
+    container_name: nginx-frontends
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - saat-network
+
 volumes:
   postgres_data:
   elastic_data:

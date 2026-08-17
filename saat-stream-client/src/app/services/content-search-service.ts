@@ -8,7 +8,7 @@ import { ContentIndex, PageResponse, SearchFilter } from '../models/content-inde
 })
 export class ContentSearchService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/contentSearch';
+  private readonly baseUrl = '/api/contentSearch';
 
   search(filter: SearchFilter): Observable<PageResponse<ContentIndex>> {
     let params = new HttpParams()
