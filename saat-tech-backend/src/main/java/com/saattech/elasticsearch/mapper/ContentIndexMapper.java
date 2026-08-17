@@ -39,7 +39,10 @@ public class ContentIndexMapper {
         List<Float> plotVector = null;
         if (metadata != null && metadata.getPlot() != null && !metadata.getPlot().trim().isEmpty()) {
             try {
-                plotVector = embeddingService.getEmbedding(metadata.getPlot());
+                List<Float> vec = embeddingService.getEmbedding(metadata.getPlot());
+                if (vec != null && !vec.isEmpty()) {
+                    plotVector = vec;
+                }
             } catch (Exception e) {
                 log.warn("Could not generate vector embedding for content ID {}: {}", content.getId(), e.getMessage());
             }
