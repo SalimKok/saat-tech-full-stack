@@ -40,7 +40,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=mysecretpassword
       - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
-      - OMDB_API_KEY=senin_omdb_keyin_buraya
+      - OMDB_API_KEY=${OMDB_API_KEY}
     ports:
       - "8080:8080"
     networks:
