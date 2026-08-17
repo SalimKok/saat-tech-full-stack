@@ -171,7 +171,7 @@ public class ContentSearchServiceImpl implements ContentSearchService {
     public void syncAllContents() {
         log.info("Starting bulk synchronization from PostgreSQL to Elasticsearch...");
         List<ContentIndex> indices = contentRepository.findAll().stream()
-                .filter(c -> c.getStatus() != ContentStatus.PUBLISHED)
+                .filter(c -> c.getStatus() == ContentStatus.PUBLISHED)
                 .map(indexMapper::toIndex)
                 .collect(Collectors.toList());
 
