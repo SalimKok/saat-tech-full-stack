@@ -41,6 +41,7 @@ services:
       - DB_PASSWORD=mysecretpassword
       - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
       - OMDB_API_KEY=${OMDB_API_KEY}
+      - SPRING_AI_OLLAMA_BASE_URL=${OLLAMA_URL}
     ports:
       - "8080:8080"
     networks:
