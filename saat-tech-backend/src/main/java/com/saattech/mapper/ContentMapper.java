@@ -33,6 +33,7 @@ public class ContentMapper {
         dto.setEpisodeNo(content.getEpisodeNo());
         dto.setContentType(content.getContentType());
         dto.setCreatedAt(content.getCreatedAt());
+        dto.setStatus(content.getStatus());
 
         if (content.getMetadata() != null) {
             dto.setMetadata(metadataMapper.toDto(content.getMetadata()));
