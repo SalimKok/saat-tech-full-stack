@@ -1,5 +1,6 @@
 package com.saattech.dto.response;
 
+import com.saattech.enums.ContentStatus;
 import com.saattech.enums.ContentType;
 import lombok.Data;
 
@@ -16,5 +17,6 @@ public class ContentResponseDto {
     private List<ContentResponseDto> subContents;
     private List<ContentCastResponseDto> casts;
     private MetadataResponseDto metadata;
+    private ContentStatus status;
     private List<LicenseResponseDto> licenses;
 }
