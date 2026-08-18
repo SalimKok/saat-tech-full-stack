@@ -1,10 +1,25 @@
 @if (movie && editingMovie) {
   <div class="modal-overlay" (click)="!editLoading && close()">
     <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Edit Content & Metadata</h3>
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <h3 style="margin: 0;">Edit Content</h3>
+          
+          <!-- Dropdown ile Durum Seçimi -->
+          <select [ngModel]="editingMovie.status" 
+                  (ngModelChange)="onStatusChange($event)"
+                  [disabled]="editLoading"
+                  style="padding: 6px 10px; border-radius: 4px; background: #1a1a1a; color: white; border: 1px solid #444; font-weight: bold; cursor: pointer; outline: none;">
+            <option value="PUBLISHED">PUBLISHED</option>
+            <option value="UNPUBLISHED">UNPUBLISHED</option>
+            <option value="NO_ACTIVE_LICENSE">NO_ACTIVE_LICENSE</option>
+          </select>
+          
+          <span *ngIf="editLoading" style="font-size: 12px; color: #4dabf7; font-weight: bold;">Güncelleniyor...</span>
+        </div>
         <button class="close-btn" (click)="close()" [disabled]="editLoading">&times;</button>
       </div>
+
 
       @if (editErrorMessage) {
         <div class="alert error">{{ editErrorMessage }}</div>
@@ -113,6 +128,15 @@
                 [(casts)]="editingMovie.casts">
               </app-content-cast-editor>
             }
+            <h4 class="column-title" style="margin-top: 30px;">License Management</h4>
+            @if (editingMovie.id) {
+              <app-license-editor
+                [contentId]="editingMovie.id"
+                [licenses]="editingMovie.licenses || []"
+                (licensesChanged)="editingMovie.licenses = $event">
+              </app-license-editor>
+            }
+
           </div>
 
         </div>

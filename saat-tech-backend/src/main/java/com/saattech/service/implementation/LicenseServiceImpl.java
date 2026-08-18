@@ -7,12 +7,14 @@ import com.saattech.entity.Content;
 import com.saattech.entity.License;
 import com.saattech.enums.ContentStatus;
 import com.saattech.enums.LicenseStatus;
+import com.saattech.event.ContentSavedEvent;
 import com.saattech.exception.ResourceNotFoundException;
 import com.saattech.mapper.LicenseMapper;
 import com.saattech.repository.ContentRepository;
 import com.saattech.repository.LicenseRepository;
 import com.saattech.service.LicenseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +29,7 @@ public class LicenseServiceImpl implements LicenseService {
     private final LicenseRepository licenseRepository;
     private final ContentRepository contentRepository;
     private final LicenseMapper licenseMapper;
-    private final ContentSearchService contentSearchService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -114,7 +116,7 @@ public class LicenseServiceImpl implements LicenseService {
             if (!hasActiveLicense && content.getStatus() == ContentStatus.PUBLISHED) {
                 content.setStatus(ContentStatus.NO_ACTIVE_LICENSE);
                 contentRepository.save(content);
-                contentSearchService.indexContent(content);
+                applicationEventPublisher.publishEvent(new ContentSavedEvent(this, content));
             }
         }
     }
@@ -131,7 +133,7 @@ public class LicenseServiceImpl implements LicenseService {
         if (!hasActiveLicense) {
             content.setStatus(ContentStatus.NO_ACTIVE_LICENSE);
             contentRepository.save(content);
-            contentSearchService.indexContent(content);
+            applicationEventPublisher.publishEvent(new ContentSavedEvent(this, content));
         }
     }
 }

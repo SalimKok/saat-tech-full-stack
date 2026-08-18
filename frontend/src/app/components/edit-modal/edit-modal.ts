@@ -5,11 +5,13 @@ import { Subject, takeUntil } from 'rxjs';
 import { ContentService } from '../../services/contentService';
 import { ContentDto } from '../../models/content';
 import { ContentCastEditor } from '../content-cast-editor/content-cast-editor';
+import { LicenseEditor } from '../license-editor/license-editor';
+
 
 @Component({
   selector: 'app-edit-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ContentCastEditor],
+  imports: [CommonModule, FormsModule, ContentCastEditor, LicenseEditor],
   templateUrl: './edit-modal.html',
   styleUrl: './edit-modal.css'
 })
@@ -56,7 +58,36 @@ export class EditModal implements OnChanges, OnDestroy {
     this.closed.emit();
   }
 
-    save(): void {
+  onStatusChange(newStatus: string): void {
+    if (!this.editingMovie || !this.editingMovie.id) return;
+    if (this.editingMovie.status === newStatus) return; // Zaten aynıysa hiçbir şey yapma
+    
+    this.editLoading = true;
+    const previousStatus = this.editingMovie.status; // Hata olursa geri dönmek için eski değeri saklıyoruz
+    
+    this.contentService.changeContentStatus(this.editingMovie.id, newStatus)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updatedContent) => {
+          this.editingMovie!.status = updatedContent.status;
+          this.editLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Durum değiştirilemedi! Aktif lisans olduğundan emin olun.');
+          
+          // Hata verirse (örn: Lisans yokken Publish seçerse) dropdown'ı eski değerine anında geri çevir
+          this.editingMovie!.status = undefined as any;
+          this.cdr.detectChanges();
+          this.editingMovie!.status = previousStatus;
+          
+          this.editLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  save(): void {
     if (!this.editingMovie || !this.editingMovie.id) return;
 
     this.editLoading = true;

@@ -13,6 +13,8 @@ import com.saattech.enums.CastType;
 import com.saattech.enums.ContentStatus;
 import com.saattech.enums.ContentType;
 import com.saattech.enums.LicenseStatus;
+import com.saattech.event.ContentDeletedEvent;
+import com.saattech.event.ContentSavedEvent;
 import com.saattech.exception.DuplicateResourceException;
 import com.saattech.mapper.ContentMapper;
 import com.saattech.repository.CastRepository;
@@ -24,6 +26,7 @@ import com.saattech.service.MetadataService;
 import com.saattech.specification.builder.ContentSpecificationBuilder;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,8 +46,7 @@ public class ContentServiceImpl implements ContentService {
     private final ContentMapper contentMapper;
     private final CastRepository castRepository;
     private final MetadataService metadataService;
-    private final ContentSearchService contentSearchService;
-    private final LicenseService licenseService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Page<ContentResponseDto> getAllContents(ContentFilterDto filterDto, Pageable pageable) {
@@ -110,7 +112,7 @@ public class ContentServiceImpl implements ContentService {
         validatePublishStatus(content);
         Content savedContent = contentRepository.save(content);
 
-        contentSearchService.indexContent(savedContent);
+        applicationEventPublisher.publishEvent(new ContentSavedEvent(this, savedContent));
         return contentMapper.toDto(savedContent);
     }
 
@@ -141,7 +143,7 @@ public class ContentServiceImpl implements ContentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Content to delete not found! ID: " + id));
         softDeleteRecursively(content);
 
-        contentSearchService.deleteContentIndex(id);
+        applicationEventPublisher.publishEvent(new ContentDeletedEvent(this, id));
     }
 
     private void softDeleteRecursively(Content content) {
@@ -282,7 +284,7 @@ public class ContentServiceImpl implements ContentService {
 
         validatePublishStatus(content);
         Content savedContent = contentRepository.save(content);
-        contentSearchService.indexContent(savedContent);
+        applicationEventPublisher.publishEvent(new ContentSavedEvent(this, savedContent));
         return contentMapper.toDto(savedContent);
     }
 
@@ -312,7 +314,7 @@ public class ContentServiceImpl implements ContentService {
             content.setStatus(newStatus);
         }
         Content savedContent = contentRepository.save(content);
-        contentSearchService.indexContent(savedContent);
+        applicationEventPublisher.publishEvent(new ContentSavedEvent(this, savedContent));
         return contentMapper.toDto(savedContent);
     }
 }

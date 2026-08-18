@@ -1,5 +1,6 @@
 import { MetadataDto } from './metadata';
 import { ContentCastDto } from './content-cast';
+import { LicenseDto } from './license';
 
 export type ContentType = 'MOVIE' | 'SERIES' | 'EPISODE' | 'SEASON';
 
@@ -12,5 +13,7 @@ export interface ContentDto {
   parentId?: number;
   casts: ContentCastDto[];
   metadata: MetadataDto;
-   subContents?: ContentDto[];
+  subContents?: ContentDto[];
+  licenses?: LicenseDto[];
+   status?: 'PUBLISHED' | 'UNPUBLISHED' | 'DELETED' | 'NO_ACTIVE_LICENSE';
 }

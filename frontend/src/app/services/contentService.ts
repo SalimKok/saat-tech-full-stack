@@ -74,4 +74,9 @@ export class ContentService {
   removeCastFromContent(contentId: number, castId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${contentId}/casts/${castId}`);
   }
+
+  changeContentStatus(id: number, status: string): Observable<ContentDto> {
+    const params = new HttpParams().set('status', status);
+    return this.http.put<ContentDto>(`${this.apiUrl}/${id}/status`, null, { params });
+  }
 }
