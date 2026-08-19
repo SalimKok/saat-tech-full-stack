@@ -1,0 +1,16 @@
+.license-editor-container { margin-top: 20px; padding: 15px; background: #2a2a2a; border-radius: 8px; color: white; }
+.license-editor-container h4 { margin-top: 0; margin-bottom: 15px; color: #4dabf7; }
+.add-license-form { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+.date-group { display: flex; align-items: center; gap: 5px; }
+.form-input { padding: 8px; background: #1a1a1a; border: 1px solid #444; color: white; border-radius: 4px; }
+.btn-add { padding: 8px 15px; background: #2b8a3e; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.btn-add:hover { background: #2f9e44; }
+.btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
+.license-table { width: 100%; border-collapse: collapse; }
+.license-table th, .license-table td { padding: 10px; text-align: left; border-bottom: 1px solid #444; }
+.btn-delete { padding: 5px 10px; background: #e03131; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.btn-delete:hover { background: #f03e3e; }
+.status-badge { padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+.status-badge.active { background: #2b8a3e; color: white; }
+.status-badge.expired { background: #e03131; color: white; }
+.no-data { color: #888; font-style: italic; }

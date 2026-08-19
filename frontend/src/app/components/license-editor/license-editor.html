@@ -1,0 +1,55 @@
+<div class="license-editor-container">
+  <h4>Licenses</h4>
+
+  <div class="add-license-form">
+    <input type="text" [(ngModel)]="newLicense.name" placeholder="Provider (e.g. Netflix)" class="form-input">
+    
+    <div class="date-group">
+      <label>Start:</label>
+      <input type="date" [(ngModel)]="newLicense.startDate" class="form-input">
+    </div>
+
+    <div class="date-group">
+      <label>End:</label>
+      <input type="date" [(ngModel)]="newLicense.endDate" class="form-input">
+    </div>
+
+    <select [(ngModel)]="newLicense.status" class="form-input">
+      <option value="ACTIVE">ACTIVE</option>
+      <option value="EXPIRED">EXPIRED</option>
+    </select>
+
+    <button class="btn-add" (click)="addLicense()" [disabled]="loading">
+      {{ loading ? 'Adding...' : '+ Add' }}
+    </button>
+  </div>
+
+  <table class="license-table" *ngIf="licenses && licenses.length > 0">
+    <thead>
+      <tr>
+        <th>Provider Name</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let license of licenses">
+        <td>{{ license.name }}</td>
+        <td>{{ license.startDate }}</td>
+        <td>{{ license.endDate }}</td>
+        <td>
+          <span class="status-badge" [class]="license.status.toLowerCase()">
+            {{ license.status }}
+          </span>
+        </td>
+        <td>
+          <button class="btn-delete" (click)="deleteLicense(license.id)" [disabled]="loading">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!licenses || licenses.length === 0" class="no-data">No licenses attached.</p>
+</div>

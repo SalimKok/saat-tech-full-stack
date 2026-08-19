@@ -1,0 +1,7 @@
+{
+  "/api": {
+    "target": "http://saattechsalim.duckdns.org",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
