@@ -3,6 +3,7 @@ package com.saattech.controller;
 import  com.saattech.dto.request.ContentRequestDto;
 import com.saattech.dto.response.ContentResponseDto;
 import com.saattech.enums.CastType;
+import com.saattech.security.IsAdmin;
 import com.saattech.service.ContentService;
 import com.saattech.specification.dto.ContentFilterDto;
 import jakarta.validation.Valid;
@@ -11,11 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/contents")
 @RequiredArgsConstructor
+@IsAdmin
 public class ContentController {
     private final ContentService contentService;
 

@@ -2,12 +2,14 @@ package com.saattech.controller;
 
 import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.elasticsearch.service.ContentSearchService;
+import com.saattech.security.IsAdmin;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,7 +29,7 @@ public class ContentSearchController {
         return ResponseEntity.ok(searchResults);
     }
 
-
+    @IsAdmin
     @PostMapping("/sync-elasticsearch")
     public ResponseEntity<String> syncElasticsearch() {
         contentSearchService.syncAllContents();

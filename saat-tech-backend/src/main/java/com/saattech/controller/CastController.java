@@ -2,6 +2,7 @@ package com.saattech.controller;
 
 import com.saattech.dto.request.CastRequestDto;
 import com.saattech.dto.response.CastResponseDto;
+import com.saattech.security.IsAdmin;
 import com.saattech.service.CastService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,12 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/casts")
 @RequiredArgsConstructor
+@IsAdmin
 public class CastController {
 
     private final CastService castService;
