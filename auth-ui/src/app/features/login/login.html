@@ -1,0 +1,49 @@
+<div class="login-container">
+  <div class="glass-panel">
+    <div class="logo-section">
+      <div class="logo"></div>
+      <h2>Welcome Back</h2>
+      <p>Please enter your details to sign in.</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
+      
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          [(ngModel)]="credentials.username" 
+          required 
+          placeholder="Enter your username"
+          [disabled]="isLoading"
+        >
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          [(ngModel)]="credentials.password" 
+          required 
+          placeholder="Enter your password"
+          [disabled]="isLoading"
+        >
+      </div>
+
+      <div *ngIf="errorMessage" class="error-alert">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="error-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="!loginForm.form.valid || isLoading">
+        <span *ngIf="!isLoading">Sign In</span>
+        <div *ngIf="isLoading" class="spinner"></div>
+      </button>
+
+    </form>
+  </div>
+</div>

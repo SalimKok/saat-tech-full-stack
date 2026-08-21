@@ -1,0 +1,10 @@
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: #e2e8f0;
+  background: #020617;
+  font-family: 'Inter', sans-serif;
+}
