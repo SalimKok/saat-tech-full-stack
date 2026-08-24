@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink  } from '@angular/router';
+import { TokenService } from './core/services/token-service';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,10 @@ import { RouterOutlet, RouterLink  } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('frontend');
+  private tokenService = inject(TokenService); 
+
+   logout() {
+    this.tokenService.removeToken();
+    window.location.href = 'http://localhost:4202/login';
+  }
 }

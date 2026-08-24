@@ -1,27 +1,36 @@
-import { Component, afterNextRender } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TokenService } from '../services/token-service'; 
 
 @Component({
   selector: 'app-auth-callback',
   standalone: true,
-  templateUrl: './auth-callback.html',
-  styleUrl: './auth-callback.css'
+  template: '<h2>Authenticating... Please wait.</h2>'
 })
-export class AuthCallbackComponent {
-  
-  constructor(private router: Router) {
-    afterNextRender(() => {
-      const hash = window.location.hash;
+
+export class AuthCallbackComponent implements OnInit {
+
+  constructor(
+    private route: ActivatedRoute, 
+    private router: Router,
+    private tokenService: TokenService 
+  ) {}
+
+  ngOnInit(): void {
+    this.route.fragment.subscribe(fragment => {
       
-      if (hash && hash.includes('token=')) {
-        const token = hash.replace('#token=', '');
-        
-        localStorage.setItem('auth_token', token);
-        
-        this.router.navigate(['/search']);
-      } else {
-        window.location.href = 'http://localhost:4202/login';
+      if (fragment) {
+        const params = new URLSearchParams(fragment);
+        const token = params.get('token');
+
+        if (token) {
+          this.tokenService.setToken(token);
+          this.router.navigate(['/']); 
+          return;
+        }
       }
+      
+      window.location.href = 'http://localhost:4202/login';
     });
   }
 }

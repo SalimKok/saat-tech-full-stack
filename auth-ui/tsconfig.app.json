@@ -9,7 +9,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/app/features/register/register"  ],
   "exclude": [
     "src/**/*.spec.ts"
   ]

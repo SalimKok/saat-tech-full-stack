@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="glass-panel">
+    <div class="logo-section">
+      <div class="logo"></div>
+      <h2>Create Account</h2>
+      <p>Please enter your details to sign up.</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="login-form">
+      
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          [(ngModel)]="userData.username" 
+          required 
+          placeholder="Choose a username"
+          [disabled]="isLoading"
+        >
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          [(ngModel)]="userData.password" 
+          required 
+          placeholder="Choose a password"
+          [disabled]="isLoading"
+        >
+      </div>
+
+      <div class="input-group">
+        <label for="role">Role</label>
+        <select id="role" name="role" [(ngModel)]="userData.role" [disabled]="isLoading" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white;">
+          <option value="USER" style="color: black;">User</option>
+          <option value="ADMIN" style="color: black;">Admin</option>
+        </select>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-alert">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="error-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div *ngIf="successMessage" class="error-alert" style="background: rgba(46, 213, 115, 0.1); border-color: rgba(46, 213, 115, 0.3); color: #2ed573;">
+        <span>{{ successMessage }}</span>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="!registerForm.form.valid || isLoading">
+        <span *ngIf="!isLoading">Sign Up</span>
+        <div *ngIf="isLoading" class="spinner"></div>
+      </button>
+
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="/login" style="color: #4dabf7; text-decoration: none; font-size: 14px;">Already have an account? Sign in</a>
+      </div>
+
+    </form>
+  </div>
+</div>

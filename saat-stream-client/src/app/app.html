@@ -8,6 +8,11 @@
       <button class="sync-btn" (click)="syncIndex()" [disabled]="isSyncing">
         {{ isSyncing ? '⏳ Syncing...' : '🔄 Sync ES' }}
       </button>
+
+       <button class="sync-btn" style="background: #ff4757; color: white; margin-left: 10px; border-color: #ff4757;" (click)="logout()">
+        Logout
+      </button>
+
       <div class="nav-status">
         <span class="status-dot"></span>
         <span class="status-text">Elasticsearch: <strong>Active</strong></span>
@@ -15,7 +20,6 @@
     </div>
   </header>
 
- 
   <main class="container">
     <router-outlet></router-outlet>
   </main>

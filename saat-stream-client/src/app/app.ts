@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContentSearchService } from './services/content-search-service';
 import { RouterOutlet } from "@angular/router";
+import { TokenService } from './core/services/token-service'; 
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ import { RouterOutlet } from "@angular/router";
 export class App {
   private readonly searchService = inject(ContentSearchService);
   isSyncing = false;
+  private tokenService = inject(TokenService);
 
   syncIndex(): void {
     if (this.isSyncing) {
@@ -33,4 +35,10 @@ export class App {
       }
     });
   }
+
+    logout() {
+    this.tokenService.removeToken();
+    window.location.href = 'http://localhost:4202/login';
+  }
 }
+
