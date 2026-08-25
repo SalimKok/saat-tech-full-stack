@@ -28,14 +28,27 @@ export class ContentList implements OnInit {
   errorMessage: string = '';
 
   currentPage: number = 0;
-  readonly pageSize: number = 10;
+  readonly pageSize: number = 14;
   totalPages: number = 0;
   totalElements: number = 0;
 
-  activeFilter?: ContentFilterDto;
+    activeFilter?: ContentFilterDto = {
+    title: '',
+    contentType: '',
+    status: 'PUBLISHED',
+    genre: '',
+    minRating: null,
+    year: null
+  } as ContentFilterDto;
 
   selectedDetailId: number | null = null;
   selectedMovie: ContentDto | null = null;
+
+  isFilterOpen: boolean = false;
+
+  toggleFilter(): void {
+    this.isFilterOpen = !this.isFilterOpen;
+  }
 
   ngOnInit(): void {
     this.fetchMovies(this.currentPage);

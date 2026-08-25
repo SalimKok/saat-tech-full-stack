@@ -1,80 +1,93 @@
 <div class="list-container">
-  <header class="header-section">
-    <div>
-      <h2>Saved Movies & Series</h2>
-      <p class="subtitle">Total items in database: <strong>{{ totalElements }}</strong></p>
+  <header class="header-section premium-header">
+    <div class="header-titles">
+      <p class="subtitle">Total content in database: <strong class="highlight-text">{{ totalElements }}</strong></p>
     </div>
-    <button class="refresh-btn" (click)="fetchMovies(currentPage)">Refresh List</button>
+    <div class="header-actions">
+      <button class="btn-secondary filter-toggle-btn" (click)="toggleFilter()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+        {{ isFilterOpen ? 'Hide Filters' : 'Show Filters' }}
+      </button>
+      <button class="btn-primary refresh-btn" (click)="fetchMovies(currentPage)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        Refresh List
+      </button>
+    </div>
   </header>
 
-
-  <div class="movie-dashboard-layout">
+  <div class="movie-dashboard-layout" [class.filter-open]="isFilterOpen">
     
-    <aside class="sidebar-area">
-      <app-content-filter (filterChanged)="onFilterChanged($event)"></app-content-filter>
+    <aside class="sidebar-area" *ngIf="isFilterOpen">
+      <div class="filter-wrapper">
+        <app-content-filter (filterChanged)="onFilterChanged($event)"></app-content-filter>
+      </div>
     </aside>
 
     <main class="main-content-area">
       @if (loading) {
-        <div class="loading-box">
+        <div class="loading-box premium-box">
+          <div class="spinner"></div>
           <p>Loading movies, please wait...</p>
         </div>
       }
 
       @if (errorMessage) {
-        <div class="alert error">{{ errorMessage }}</div>
+        <div class="alert error premium-alert">{{ errorMessage }}</div>
       }
 
       @if (!loading && movies.length === 0) {
-        <div class="empty-state">
+        <div class="empty-state premium-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <p>No content found matching your filter criteria.</p>
         </div>
       }
 
       <div class="movie-grid">
         @for (movie of movies; track movie.id ?? $index) {
-          <article class="movie-card" (click)="openDetailModal(movie)" style="cursor: pointer;">
+          <article class="movie-card premium-card" (click)="openDetailModal(movie)">
             <div class="card-poster">
-              <img [src]="movie.metadata.poster" [alt]="movie.metadata.title" />
+              <img [src]="movie.metadata.poster" [alt]="movie.metadata.title" loading="lazy" />
+              <div class="card-overlay">
+                <span class="view-details">View Details</span>
+              </div>
             </div>
             <div class="card-body">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="type-badge">{{ movie.contentType }}</span>
+              <div class="card-header-meta">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <span class="type-badge">{{ movie.contentType }}</span>
+                  <div class="rating-badge" style="margin-bottom: 0; padding: 4px 8px; font-size: 14px; border-radius: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="#fcc419" viewBox="0 0 24 24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <span>{{ movie.metadata.imdbRating }}</span>
+                  </div>
+                </div>
                 @if (movie.contentType === 'SERIES' && movie.subContents?.length) {
-                  <span style="font-size: 11px; color: var(--primary); font-weight: bold;">{{ movie.subContents?.length }} Season(s)</span>
+                  <span class="sub-meta">{{ movie.subContents?.length }} Season(s)</span>
                 } @else if (movie.contentType === 'SEASON' && movie.subContents?.length) {
-                  <span style="font-size: 11px; color: var(--primary); font-weight: bold;">{{ movie.subContents?.length }} Episode(s)</span>
+                  <span class="sub-meta">{{ movie.subContents?.length }} Episode(s)</span>
                 }
               </div>
-
-              <h3>{{ movie.metadata.title }}</h3>
+              <h3 class="movie-title" [title]="movie.metadata.title">{{ movie.metadata.title }}</h3>
               <p class="genre">{{ movie.metadata.genre }}</p>
-              <p class="rating">⭐ {{ movie.metadata.imdbRating }} / 10</p>
               <p class="plot-snippet">{{ movie.metadata.plot }}</p>
-
             </div>
           </article>
         }
       </div>
 
       @if (totalElements > 0) {
-        <nav class="pagination-section" aria-label="Pagination">
-          <button 
-            class="page-btn" 
-            (click)="onPrevPage()" 
-            [disabled]="currentPage === 0">
-            ⬅️ Previous
+        <nav class="pagination-section premium-pagination" aria-label="Pagination">
+          <button class="page-btn" (click)="onPrevPage()" [disabled]="currentPage === 0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Previous
           </button>
 
           <span class="page-info">
-            Page <strong>{{ currentPage + 1 }}</strong> of <strong>{{ totalPages || 1 }}</strong>
+            Page <strong class="highlight-text">{{ currentPage + 1 }}</strong> of <strong class="highlight-text">{{ totalPages || 1 }}</strong>
           </span>
 
-          <button 
-            class="page-btn" 
-            (click)="onNextPage()" 
-            [disabled]="currentPage >= totalPages - 1">
-            Next ➡️
+          <button class="page-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages - 1">
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </button>
         </nav>
       }

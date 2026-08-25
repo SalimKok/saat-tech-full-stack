@@ -42,6 +42,14 @@ public class CastServiceImpl implements CastService {
     }
 
     @Override
+    public CastResponseDto getCastById(Long id) {
+        Cast cast = castRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cast not found! ID: " + id));
+        return castMapper.toDto(cast);
+    }
+
+
+    @Override
     public CastResponseDto saveCast(CastRequestDto requestDto) {
         Cast existingCast = castRepository.findByName(requestDto.getName());
 

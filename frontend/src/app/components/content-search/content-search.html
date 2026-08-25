@@ -5,7 +5,7 @@
       <h2>Create New Content</h2>
       <p class="subtitle">Enter content details manually or autofill instantly using an IMDb ID.</p>
     </div>
-    <div style="display: flex; gap: 10px; align-items: center;">
+    <div style="display: flex; gap: 12px; align-items: center;">
       <button type="button" class="btn-primary" (click)="showBulkModal = true">
         Bulk Import
       </button>
@@ -28,10 +28,8 @@
     <div class="alert success">{{ successMessage }}</div>
   }
 
-  
-  <div class="card create-layout">
+  <div class="glass-panel create-layout">
 
-    
     <div class="poster-sidebar">
       <div class="poster-frame">
         @if (movie.metadata.poster) {
@@ -39,62 +37,59 @@
         } @else {
           <div class="poster-placeholder">
             <span class="poster-icon">🎬</span>
-            <p>No Poster Added</p>
-            <small>Paste a URL below</small>
+            <p style="margin: 0; font-size: 16px; font-weight: 600;">No Poster Added</p>
+            <small style="font-size: 13px;">Paste a URL below</small>
           </div>
         }
       </div>
 
-      
-      <div class="form-group" style="margin-top: 14px;">
+      <div class="form-group" style="margin-bottom: 0;">
         <label>Poster Image URL:</label>
         <input 
           type="text" 
+          class="glass-input"
           [(ngModel)]="movie.metadata.poster" 
           placeholder="https://images.../poster.jpg" 
         />
       </div>
 
-      
       @if (movie.metadata.title) {
         <div class="mini-preview-info">
           <span class="type-badge">{{ movie.contentType }}</span>
           @if (movie.metadata.imdbRating) {
-            <span class="rating-badge"> {{ movie.metadata.imdbRating }}</span>
+            <span class="rating-badge">⭐ {{ movie.metadata.imdbRating }}</span>
           }
         </div>
       }
     </div>
 
-    
     <div class="form-main">
 
-      
       <div class="autofill-strip">
         <div class="autofill-label">
-          <span class="bolt"></span>
           <span>Quick Autofill:</span>
         </div>
         <input 
           type="text" 
+          class="glass-input"
+          style="background: rgba(0,0,0,0.25);"
           [(ngModel)]="imdbId" 
           placeholder="Enter IMDb ID (e.g. tt1375666)" 
           (keyup.enter)="onAutofillFromOmdb()"
         />
-        <button type="button" class="btn-primary" (click)="onAutofillFromOmdb()" [disabled]="fetchLoading">
+        <button type="button" class="btn-primary" style="padding: 14px 28px; font-size: 16px;" (click)="onAutofillFromOmdb()" [disabled]="fetchLoading">
           {{ fetchLoading ? 'Fetching...' : 'Autofill' }}
         </button>
       </div>
 
-      
       <div class="form-row">
         <div class="form-group flex-2">
           <label>Title <span class="required">*</span>:</label>
-          <input type="text" [(ngModel)]="movie.metadata.title" placeholder="e.g. Interstellar" required />
+          <input type="text" class="glass-input" [(ngModel)]="movie.metadata.title" placeholder="e.g. Interstellar" required />
         </div>
         <div class="form-group flex-1">
           <label>Content Type:</label>
-          <select [(ngModel)]="movie.contentType" (ngModelChange)="loadPotentialParents()">
+          <select class="glass-input" [(ngModel)]="movie.contentType" (ngModelChange)="loadPotentialParents()">
             <option value="MOVIE">MOVIE</option>
             <option value="SERIES">SERIES</option>
             <option value="SEASON">SEASON</option>
@@ -103,26 +98,26 @@
         </div>
       </div>
 
-    
       @if (movie.contentType === 'SERIES') {
-        <div class="card" style="background: rgba(34, 139, 230, 0.06); border: 1px solid var(--primary); margin-bottom: 16px; padding: 14px 18px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+        <div class="glass-panel" style="background: rgba(34, 139, 230, 0.06); border: 1px solid rgba(34, 139, 230, 0.3); margin-bottom: 28px; padding: 24px;">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
             <input 
               type="checkbox" 
               id="autoTreeCheck" 
               [(ngModel)]="autoGenerateTree" 
-              style="width: 18px; height: 18px; cursor: pointer;"
+              style="width: 22px; height: 22px; cursor: pointer; accent-color: #228be6;"
             />
-            <label for="autoTreeCheck" style="font-weight: bold; color: var(--primary); cursor: pointer; margin: 0;">
+            <label for="autoTreeCheck" style="font-weight: bold; color: #74c0fc; cursor: pointer; margin: 0; font-size: 16px;">
               Auto-Generate Seasons & Episodes in One Click
             </label>
           </div>
           @if (autoGenerateTree) {
-            <div class="form-row" style="margin-bottom: 12px;">
+            <div class="form-row" style="margin-bottom: 20px;">
               <div class="form-group flex-1">
                 <label>Number of Seasons:</label>
                 <input 
                   type="number" 
+                  class="glass-input"
                   min="1" 
                   max="50" 
                   [(ngModel)]="seasonCount" 
@@ -131,13 +126,13 @@
                 />
               </div>
             </div>
-            <!-- Her sezon için ayrı bölüm sayısı input grid'i -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 10px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
               @for (ep of seasonEpisodes; track $index) {
                 <div class="form-group" style="margin-bottom: 0;">
                   <label>Season {{ $index + 1 }} Episodes:</label>
                   <input 
                     type="number" 
+                    class="glass-input"
                     min="1" 
                     max="100" 
                     [(ngModel)]="seasonEpisodes[$index]" 
@@ -146,7 +141,7 @@
                 </div>
               }
             </div>
-            <p style="margin: 12px 0 0 0; font-size: 12px; color: var(--text-muted);">
+            <p style="margin: 20px 0 0 0; font-size: 14px; color: rgba(255,255,255,0.7);">
               <strong>{{ seasonCount || 0 }} Season(s)</strong> and <strong>{{ getTotalEpisodes() }} Episodes</strong> will automatically be created and linked to this series.
             </p>
           }
@@ -157,7 +152,7 @@
         <div class="form-row">
           <div class="form-group flex-2">
             <label>Belongs to Series (Parent Series) <span class="required">*</span>:</label>
-            <select [(ngModel)]="movie.parentId">
+            <select class="glass-input" [(ngModel)]="movie.parentId">
               <option [ngValue]="undefined">-- Select Series --</option>
               @for (series of seriesList; track series.id) {
                 <option [ngValue]="series.id">{{ series.metadata.title }} (#{{ series.id }})</option>
@@ -166,17 +161,16 @@
           </div>
           <div class="form-group flex-1">
             <label>Season Number <span class="required">*</span>:</label>
-            <input type="number" min="1" [(ngModel)]="movie.seasonNo" placeholder="e.g. 1" />
+            <input type="number" class="glass-input" min="1" [(ngModel)]="movie.seasonNo" placeholder="e.g. 1" />
           </div>
         </div>
       }
 
-     
       @if (movie.contentType === 'EPISODE') {
         <div class="form-row">
           <div class="form-group flex-2">
             <label>Belongs to Season (Parent Season) <span class="required">*</span>:</label>
-            <select [(ngModel)]="movie.parentId">
+            <select class="glass-input" [(ngModel)]="movie.parentId">
               <option [ngValue]="undefined">-- Select Season --</option>
               @for (season of seasonsList; track season.id) {
                 <option [ngValue]="season.id">
@@ -187,74 +181,68 @@
           </div>
           <div class="form-group flex-1">
             <label>Episode Number <span class="required">*</span>:</label>
-            <input type="number" min="1" [(ngModel)]="movie.episodeNo" placeholder="e.g. 1" />
+            <input type="number" class="glass-input" min="1" [(ngModel)]="movie.episodeNo" placeholder="e.g. 1" />
           </div>
         </div>
       }
 
-      
       <div class="form-row">
         <div class="form-group flex-1">
           <label>Genre:</label>
-          <input type="text" [(ngModel)]="movie.metadata.genre" placeholder="e.g. Sci-Fi, Adventure" />
+          <input type="text" class="glass-input" [(ngModel)]="movie.metadata.genre" placeholder="e.g. Sci-Fi, Adventure" />
         </div>
         <div class="form-group flex-1">
           <label>Released Date:</label>
-          <input type="text" [(ngModel)]="movie.metadata.released" placeholder="e.g. 2014-11-07" />
+          <input type="text" class="glass-input" [(ngModel)]="movie.metadata.released" placeholder="e.g. 2014-11-07" />
         </div>
         <div class="form-group flex-1">
           <label>Runtime:</label>
-          <input type="text" [(ngModel)]="movie.metadata.runtime" placeholder="e.g. 169 min" />
+          <input type="text" class="glass-input" [(ngModel)]="movie.metadata.runtime" placeholder="e.g. 169 min" />
         </div>
       </div>
 
-      
       <div class="form-row">
         <div class="form-group flex-1">
           <label>IMDb Rating (0-10):</label>
-          <input type="number" step="0.1" min="0" max="10" [(ngModel)]="movie.metadata.imdbRating" placeholder="8.6" />
+          <input type="number" class="glass-input" step="0.1" min="0" max="10" [(ngModel)]="movie.metadata.imdbRating" placeholder="8.6" />
         </div>
         <div class="form-group flex-1">
           <label>Age / Rated:</label>
-          <input type="text" [(ngModel)]="movie.metadata.rated" placeholder="e.g. PG-13" />
+          <input type="text" class="glass-input" [(ngModel)]="movie.metadata.rated" placeholder="e.g. PG-13" />
         </div>
         <div class="form-group flex-1">
           <label>Language:</label>
-          <input type="text" [(ngModel)]="movie.metadata.language" placeholder="e.g. English" />
+          <input type="text" class="glass-input" [(ngModel)]="movie.metadata.language" placeholder="e.g. English" />
         </div>
         <div class="form-group flex-1">
           <label>Country:</label>
-          <input type="text" [(ngModel)]="movie.metadata.country" placeholder="e.g. USA, UK" />
+          <input type="text" class="glass-input" [(ngModel)]="movie.metadata.country" placeholder="e.g. USA, UK" />
         </div>
       </div>
 
-      
-      <div class="form-group">
+      <div class="form-group" style="flex: 1;">
         <label>Plot / Synopsis:</label>
-        <textarea rows="3" [(ngModel)]="movie.metadata.plot" placeholder="Brief synopsis of the content..."></textarea>
+        <textarea class="glass-input" style="height: 100%; min-height: 120px; resize: vertical;" [(ngModel)]="movie.metadata.plot" placeholder="Brief synopsis of the content..."></textarea>
       </div>
 
-      
       @if (movie.casts && movie.casts.length > 0) {
         <div class="form-group">
           <label>Autofilled Cast & Crew ({{ movie.casts.length }}):</label>
-          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
             @for (c of movie.casts; track $index) {
-              <div class="cast-chip">
-                <span class="role" [ngClass]="c.role.toLowerCase()">{{ c.role }}</span>
-                <span>{{ c.castName || c.cast?.name }}</span>
+              <div class="cast-chip" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px;">
+                <span class="role" style="font-size: 12px; text-transform: uppercase; color: #a5b4fc; margin-right: 8px;">{{ c.role }}</span>
+                <span style="font-weight: 500; font-size: 14px;">{{ c.castName || c.cast?.name }}</span>
               </div>
             }
           </div>
         </div>
       }
 
-      
-      <div style="margin-top: 24px;">
+      <div style="margin-top: 10px;">
         <button 
           type="button" 
-          class="btn-success" 
-          style="width: 100%; padding: 12px; font-size: 15px;"
+          class="btn-save-premium" 
           (click)="onSave()" 
           [disabled]="saveLoading || !movie.metadata.title.trim()">
           {{ saveLoading ? 'Saving Content...' : 'Save & Create Content' }}

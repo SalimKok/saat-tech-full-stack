@@ -1,18 +1,25 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet, RouterLink  } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { TokenService } from './core/services/token-service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink ],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
   protected readonly title = signal('frontend');
   private tokenService = inject(TokenService); 
+  
+  isSidebarExpanded = true;
 
-   logout() {
+  toggleSidebar(): void {
+    this.isSidebarExpanded = !this.isSidebarExpanded;
+  }
+
+  logout(): void {
     this.tokenService.removeToken();
     window.location.href = 'http://localhost:4202/login';
   }

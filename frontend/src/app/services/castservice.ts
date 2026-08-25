@@ -24,6 +24,17 @@ export class CastService {
     return this.http.get<PageResponse<CastDto>>(this.apiUrl, { params });
   }
 
+  getCastById(id: number): Observable<CastDto> {
+    return this.http.get<CastDto>(`${this.apiUrl}/${id}`);
+  }
+
+  uploadPoster(file: File): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return this.http.post<{ url: string }>(`${this.apiUrl}/upload-poster`, formData);
+  }
+
   saveCast(cast: CastDto): Observable<CastDto> {
     return this.http.post<CastDto>(this.apiUrl, cast);
   }

@@ -1,0 +1,87 @@
+<div class="form-container">
+  <div class="form-card glass-panel">
+    
+    <div class="form-header">
+      <button class="btn-back" (click)="goBack()">← Back</button>
+      <h2>{{ isEditMode ? 'Edit Cast' : 'Add New Cast' }}</h2>
+    </div>
+
+    <div class="error-message glass-panel" *ngIf="errorMessage">
+      ⚠ {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #castForm="ngForm">
+      
+      <div class="form-group">
+        <label for="name">Cast Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          [(ngModel)]="name" 
+          required 
+          placeholder="e.g. Keanu Reeves"
+          class="glass-input"
+          [disabled]="isSubmitting || isDeleting"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Poster</label>
+        
+        <div class="input-type-selector">
+          <button type="button" class="btn-tab" [class.active]="inputType === 'UPLOAD'" (click)="setUploadMode()">Upload File</button>
+          <button type="button" class="btn-tab" [class.active]="inputType === 'URL'" (click)="setUrlMode()">Enter URL</button>
+        </div>
+
+        <div *ngIf="inputType === 'UPLOAD'" class="upload-section">
+          <div 
+            class="upload-area glass-input" 
+            [class.has-image]="imagePreview"
+            (dragover)="onDragOver($event)" 
+            (drop)="onDrop($event)"
+          >
+            <input type="file" (change)="onFileSelected($event)" class="file-input-hidden" #fileInput accept="image/*">
+            
+            <div *ngIf="!imagePreview" class="upload-placeholder">
+              <span class="upload-icon">📥</span>
+              <p>Drag and drop an image here</p>
+              <p class="or-text">- or -</p>
+              <button type="button" class="btn-browse" (click)="fileInput.click()">Browse Files</button>
+            </div>
+            <div *ngIf="imagePreview" class="image-preview" (click)="fileInput.click()" style="cursor: pointer;" title="Click to change image">
+              <img [src]="imagePreview" alt="Preview" />
+              <button type="button" class="btn-remove" (click)="removeImage(); $event.stopPropagation()" title="Remove Image">✖</button>
+            </div>
+          </div>
+        </div>
+
+
+        <div *ngIf="inputType === 'URL'" class="url-section">
+          <input 
+            type="text" 
+            name="posterUrl" 
+            [(ngModel)]="posterUrl" 
+            (ngModelChange)="onPosterUrlChange()"
+            placeholder="https://example.com/image.jpg"
+            class="glass-input url-input"
+            [disabled]="isSubmitting || isDeleting"
+          />
+          <div *ngIf="imagePreview" class="url-preview-container">
+            <img [src]="imagePreview" alt="Preview" class="url-preview-img" (error)="imagePreview = null" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="isSubmitting || isDeleting || !name">
+          {{ isSubmitting ? 'Saving...' : 'Save Cast' }}
+        </button>
+        <button *ngIf="isEditMode" type="button" class="btn-danger" [disabled]="isSubmitting || isDeleting" (click)="deleteCast()">
+          {{ isDeleting ? 'Deleting...' : 'Delete Cast' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="cast-container">
+  <div class="header-section glass-panel">
+    
+    <div class="title-area">
+      <p>Total Cast in Database: <strong style="color: #6366f1; font-size: 16px;">{{ totalCasts }}</strong></p>
+    </div>
+    
+    <div class="action-area">
+      <div class="search-box">
+        <i class="search-icon">🔍</i>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (ngModelChange)="onSearch()" 
+          placeholder="Search by name..."
+          class="glass-input search-input"
+        />
+      </div>
+      <button class="btn-primary" (click)="navigateToAdd()">
+        <span class="icon">+</span> Add New Cast
+      </button>
+    </div>
+
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading cast members...</p>
+  </div>
+
+  <div class="cast-grid" *ngIf="!loading && casts.length > 0">
+    <div class="cast-card glass-panel" *ngFor="let cast of casts" (click)="onCardClick(cast.id)" style="cursor: pointer;">
+      <div class="card-poster">
+        <img [src]="cast.poster" [alt]="cast.name" *ngIf="cast.poster" />
+        <div class="no-image" *ngIf="!cast.poster">👤</div>
+      </div>
+      <div class="card-info">
+        <h3>{{ cast.name }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state glass-panel" *ngIf="!loading && casts.length === 0">
+    <div class="empty-icon">🎭</div>
+    <h3>No cast members found</h3>
+    <p>Try adjusting your search or add a new member.</p>
+  </div>
+
+  <div class="pagination-bar glass-panel" *ngIf="totalPages > 1">
+    <button class="btn-page" [disabled]="currentPage === 0" (click)="onPrevPage()">Previous</button>
+    <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+    <button class="btn-page" [disabled]="currentPage === totalPages - 1" (click)="onNextPage()">Next</button>
+  </div>
+</div>

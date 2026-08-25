@@ -4,6 +4,7 @@ import com.saattech.dto.request.CastRequestDto;
 import com.saattech.dto.response.CastResponseDto;
 import com.saattech.security.IsAdmin;
 import com.saattech.service.CastService;
+import com.saattech.service.StorageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/casts")
@@ -21,13 +26,19 @@ import java.util.List;
 public class CastController {
 
     private final CastService castService;
-
+    private final StorageService storageService;
 
     @GetMapping
     public ResponseEntity<Page<CastResponseDto>> getAllCasts(
             @RequestParam(required = false) String name,
             Pageable pageable) {
         Page<CastResponseDto> response = castService.getAllCasts(name, pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CastResponseDto> getCastById(@PathVariable Long id) {
+        CastResponseDto response = castService.getCastById(id);
         return ResponseEntity.ok(response);
     }
 
@@ -47,6 +58,16 @@ public class CastController {
     public ResponseEntity<CastResponseDto> updateCast(@PathVariable Long id,@Valid @RequestBody CastRequestDto requestDto) {
         CastResponseDto updatedCast = castService.updateCast(id, requestDto);
         return ResponseEntity.ok(updatedCast);
+    }
+
+    @PostMapping("/upload-poster")
+    public ResponseEntity<Map<String, String>> uploadPoster(@RequestParam("file") MultipartFile file) {
+        String fileUrl = storageService.store(file);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("url", fileUrl);
+
+        return ResponseEntity.ok(response);
     }
 }
 

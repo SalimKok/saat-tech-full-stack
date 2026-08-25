@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CastManagement } from './cast-management';
+import { CastForm } from './cast-form';
 
-describe('CastManagement', () => {
-  let component: CastManagement;
-  let fixture: ComponentFixture<CastManagement>;
+describe('CastForm', () => {
+  let component: CastForm;
+  let fixture: ComponentFixture<CastForm>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CastManagement],
+      imports: [CastForm],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CastManagement);
+    fixture = TestBed.createComponent(CastForm);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

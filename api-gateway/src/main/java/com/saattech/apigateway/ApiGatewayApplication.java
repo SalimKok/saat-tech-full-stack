@@ -43,7 +43,7 @@ public class ApiGatewayApplication {
 	@Bean
 	public RouterFunction<ServerResponse> gatewayRoutes() {
 		return GatewayRouterFunctions.route("core-service")
-				.route(GatewayRequestPredicates.path("/api/contents/**", "/api/casts/**", "/api/licenses/**", "/api/contentSearch/**"), http())
+				.route(GatewayRequestPredicates.path("/api/contents/**", "/api/casts/**", "/api/licenses/**", "/api/contentSearch/**", "/uploads/**"), http())
 				.filter(lb("core-service"))
 				.before(BeforeFilterFunctions.addRequestHeader("X-Gateway-Secret", gatewaySecret))
 				.build()

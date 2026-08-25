@@ -11,6 +11,8 @@ public interface CastService {
 
     Page<CastResponseDto> getAllCasts(String name, Pageable pageable);
 
+    CastResponseDto getCastById(Long id);
+
     CastResponseDto saveCast(CastRequestDto requestDto);
 
     void deleteCast(Long id);
