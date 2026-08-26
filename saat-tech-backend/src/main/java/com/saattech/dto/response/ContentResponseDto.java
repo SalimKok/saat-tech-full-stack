@@ -19,4 +19,5 @@ public class ContentResponseDto {
     private MetadataResponseDto metadata;
     private ContentStatus status;
     private List<LicenseResponseDto> licenses;
+    private List<TrailerResponseDto> trailers;
 }

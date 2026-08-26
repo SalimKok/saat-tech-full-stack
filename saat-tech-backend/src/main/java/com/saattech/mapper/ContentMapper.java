@@ -21,6 +21,7 @@ public class ContentMapper {
     private final CastMapper castMapper;
     private final MetadataMapper metadataMapper;
     private final LicenseMapper licenseMapper;
+    private final TrailerMapper trailerMapper;
 
     public ContentResponseDto toDto(Content content) {
         if (content == null) {
@@ -68,6 +69,10 @@ public class ContentMapper {
                     .collect(Collectors.toList());
             dto.setLicenses(licenseDtoList);
         }
+
+        if (content.getTrailers() != null && !content.getTrailers().isEmpty()) {
+            dto.setTrailers(trailerMapper.toDtoList(content.getTrailers()));
+            }
 
         return dto;
     }

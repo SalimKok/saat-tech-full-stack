@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "app.storage")
-public class StorageProperties {
-    private String uploadDir = "uploads";
+@ConfigurationProperties(prefix = "tmdb.api")
+public class TmdbProperties {
+
+    private String baseUrl = "https://api.themoviedb.org/3";
+    private String apiKey;
 }

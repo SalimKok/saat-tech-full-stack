@@ -2,7 +2,6 @@ package com.saattech.service.implementation;
 
 import com.saattech.dto.request.LicenseRequestDto;
 import com.saattech.dto.response.LicenseResponseDto;
-import com.saattech.elasticsearch.service.ContentSearchService;
 import com.saattech.entity.Content;
 import com.saattech.entity.License;
 import com.saattech.enums.ContentStatus;
