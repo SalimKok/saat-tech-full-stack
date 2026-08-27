@@ -1,4 +1,4 @@
-package com.saattech.dto.response;
+package com.saattech.dto.bulkimport;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,8 +1,10 @@
-package com.saattech.dto.request;
+package com.saattech.dto.content;
 
+import com.saattech.dto.contentcast.ContentCastRequestDto;
+import com.saattech.dto.license.LicenseRequestDto;
+import com.saattech.dto.metadata.MetadataRequestDto;
 import com.saattech.enums.ContentType;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

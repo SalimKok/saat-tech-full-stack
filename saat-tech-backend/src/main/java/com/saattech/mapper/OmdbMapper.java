@@ -1,8 +1,8 @@
 package com.saattech.mapper;
 
 import com.saattech.dto.omdb.OmdbResponseDto;
-import com.saattech.dto.request.ContentRequestDto;
-import com.saattech.dto.request.MetadataRequestDto;
+import com.saattech.dto.content.ContentRequestDto;
+import com.saattech.dto.metadata.MetadataRequestDto;
 import com.saattech.enums.ContentType;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;

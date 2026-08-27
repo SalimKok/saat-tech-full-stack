@@ -1,7 +1,7 @@
 package com.saattech.controller;
 
-import  com.saattech.dto.request.ContentRequestDto;
-import com.saattech.dto.response.ContentResponseDto;
+import com.saattech.dto.content.ContentRequestDto;
+import com.saattech.dto.content.ContentResponseDto;
 import com.saattech.enums.CastType;
 import com.saattech.security.IsAdmin;
 import com.saattech.service.ContentService;
@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

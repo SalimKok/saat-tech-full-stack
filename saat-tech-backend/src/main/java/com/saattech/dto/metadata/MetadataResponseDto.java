@@ -1,4 +1,4 @@
-package com.saattech.dto.response;
+package com.saattech.dto.metadata;
 
 import lombok.Data;
 

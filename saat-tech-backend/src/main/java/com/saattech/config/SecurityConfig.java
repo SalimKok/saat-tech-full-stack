@@ -1,5 +1,6 @@
 package com.saattech.config;
 
+import com.saattech.config.properties.StorageProperties;
 import com.saattech.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final StorageProperties storageProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -30,7 +32,7 @@ public class SecurityConfig {
                                 "/actuator/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/uploads/**"
+                                storageProperties.getUrlPrefix() + "/**"
                         ).permitAll()
 
                         .requestMatchers("/api/**").authenticated()

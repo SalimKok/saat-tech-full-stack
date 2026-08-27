@@ -1,11 +1,14 @@
 package com.saattech.mapper;
 
-import com.saattech.dto.response.TrailerResponseDto;
+import com.saattech.dto.trailer.TrailerResponseDto;
 import com.saattech.entity.Trailer;
 import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.saattech.dto.tmdb.TmdbVideoResponseDto;
+import com.saattech.entity.Content;
+
 
 @Component
 public class TrailerMapper {
@@ -44,4 +47,22 @@ public class TrailerMapper {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
+    public Trailer toEntity(TmdbVideoResponseDto.TmdbVideoResult result, Content content) {
+        if (result == null) {
+            return null;
+        }
+
+        Trailer trailer = new Trailer();
+        trailer.setName(result.getName());
+        trailer.setYoutubeKey(result.getKey());
+        trailer.setSite(result.getSite());
+        trailer.setType(result.getType());
+        trailer.setSize(result.getSize());
+        trailer.setLanguage(result.getLanguage());
+        trailer.setContent(content);
+
+        return trailer;
+    }
+
 }

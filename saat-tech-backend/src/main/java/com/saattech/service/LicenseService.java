@@ -1,7 +1,7 @@
 package com.saattech.service;
 
-import com.saattech.dto.request.LicenseRequestDto;
-import com.saattech.dto.response.LicenseResponseDto;
+import com.saattech.dto.license.LicenseRequestDto;
+import com.saattech.dto.license.LicenseResponseDto;
 
 public interface LicenseService {
     LicenseResponseDto addLicenseToContent(Long contentId, LicenseRequestDto requestDto);

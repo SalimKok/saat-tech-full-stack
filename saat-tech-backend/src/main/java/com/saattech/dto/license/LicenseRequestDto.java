@@ -1,4 +1,4 @@
-package com.saattech.dto.request;
+package com.saattech.dto.license;
 
 import com.saattech.enums.LicenseStatus;
 import lombok.Data;

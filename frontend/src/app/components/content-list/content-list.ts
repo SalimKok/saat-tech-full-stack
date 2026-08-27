@@ -6,12 +6,12 @@ import { ContentDto } from '../../models/content';
 import { ContentFilterDto } from '../../models/content-filter';
 import { ContentFilter } from '../content-filter/content-filter';
 import { EditModal } from '../edit-modal/edit-modal';
-import { ContentDetailModal } from '../content-detail-modal/content-detail-modal';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-content-list',
   standalone: true,
-  imports: [CommonModule, ContentFilter, EditModal, ContentDetailModal],
+  imports: [CommonModule, ContentFilter, EditModal, RouterModule],
   templateUrl: './content-list.html',
   styleUrl: './content-list.css',
 })
@@ -19,9 +19,6 @@ export class ContentList implements OnInit {
   private readonly contentService = inject(ContentService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
-
-  
-  @ViewChild(ContentDetailModal) detailModal?: ContentDetailModal;
 
   movies: ContentDto[] = [];
   loading: boolean = false;
@@ -137,8 +134,5 @@ export class ContentList implements OnInit {
   onMovieSaved(): void {
     this.selectedMovie = null;
     this.fetchMovies(this.currentPage);
-    if (this.selectedDetailId && this.detailModal) {
-      this.detailModal.fetchContentHierarchy(this.selectedDetailId);
-    }
   }
 }

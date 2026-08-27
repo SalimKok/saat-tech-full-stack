@@ -1,4 +1,4 @@
-package com.saattech.config;
+package com.saattech.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,7 +12,7 @@ public class SearchProperties {
     private Expansion expansion = new Expansion();
     @Data
     public static class Expansion {
-        private int minWord = 3;
+        private int minWord;
     }
 
     private Rrf rrf = new Rrf();

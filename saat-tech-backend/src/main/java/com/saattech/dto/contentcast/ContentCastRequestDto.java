@@ -1,4 +1,4 @@
-package com.saattech.dto.request;
+package com.saattech.dto.contentcast;
 
 import com.saattech.enums.CastType;
 import jakarta.validation.constraints.NotNull;

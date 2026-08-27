@@ -29,16 +29,29 @@
   </div>
 
   <div class="cast-grid" *ngIf="!loading && casts.length > 0">
+    
     <div class="cast-card glass-panel" *ngFor="let cast of casts" (click)="onCardClick(cast.id)" style="cursor: pointer;">
+      
       <div class="card-poster">
         <img [src]="cast.poster" [alt]="cast.name" *ngIf="cast.poster" />
         <div class="no-image" *ngIf="!cast.poster">👤</div>
+        
+        <div class="card-overlay">
+          <div class="edit-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span>Edit</span>
+          </div>
+        </div>
       </div>
+
       <div class="card-info">
         <h3>{{ cast.name }}</h3>
       </div>
+      
     </div>
+
   </div>
+
 
   <div class="empty-state glass-panel" *ngIf="!loading && casts.length === 0">
     <div class="empty-icon">🎭</div>

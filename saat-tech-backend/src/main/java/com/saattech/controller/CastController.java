@@ -1,7 +1,7 @@
 package com.saattech.controller;
 
-import com.saattech.dto.request.CastRequestDto;
-import com.saattech.dto.response.CastResponseDto;
+import com.saattech.dto.cast.CastRequestDto;
+import com.saattech.dto.cast.CastResponseDto;
 import com.saattech.security.IsAdmin;
 import com.saattech.service.CastService;
 import com.saattech.service.StorageService;
@@ -11,12 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController

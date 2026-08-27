@@ -1,7 +1,7 @@
 package com.saattech.elasticsearch.builder;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import com.saattech.config.SearchProperties;
+import com.saattech.config.properties.SearchProperties;
 import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;

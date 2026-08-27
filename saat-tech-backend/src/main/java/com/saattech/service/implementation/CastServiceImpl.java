@@ -1,7 +1,7 @@
 package com.saattech.service.implementation;
 
-import com.saattech.dto.request.CastRequestDto;
-import com.saattech.dto.response.CastResponseDto;
+import com.saattech.dto.cast.CastRequestDto;
+import com.saattech.dto.cast.CastResponseDto;
 import com.saattech.entity.Cast;
 import com.saattech.enums.CastStatus;
 import com.saattech.mapper.CastMapper;

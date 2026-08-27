@@ -1,6 +1,6 @@
 package com.saattech.security;
 
-import com.saattech.config.GatewayProperties;
+import com.saattech.config.properties.GatewayProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

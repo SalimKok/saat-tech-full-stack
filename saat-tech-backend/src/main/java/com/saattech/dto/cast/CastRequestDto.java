@@ -1,4 +1,4 @@
-package com.saattech.dto.request;
+package com.saattech.dto.cast;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

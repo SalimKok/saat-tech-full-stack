@@ -1,7 +1,7 @@
 package com.saattech.service;
 
-import com.saattech.dto.request.ContentRequestDto;
-import com.saattech.dto.response.BulkImportResponseDto;
+import com.saattech.dto.content.ContentRequestDto;
+import com.saattech.dto.bulkimport.BulkImportResponseDto;
 
 import java.util.List;
 

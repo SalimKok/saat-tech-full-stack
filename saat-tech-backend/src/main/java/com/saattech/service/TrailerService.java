@@ -1,6 +1,6 @@
 package com.saattech.service;
 
-import com.saattech.dto.response.TrailerResponseDto;
+import com.saattech.dto.trailer.TrailerResponseDto;
 import java.util.List;
 
 public interface TrailerService {

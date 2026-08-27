@@ -1,7 +1,7 @@
 package com.saattech.mapper;
 
-import com.saattech.dto.request.MetadataRequestDto;
-import com.saattech.dto.response.MetadataResponseDto;
+import com.saattech.dto.metadata.MetadataRequestDto;
+import com.saattech.dto.metadata.MetadataResponseDto;
 import com.saattech.entity.Metadata;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +23,11 @@ public class MetadataMapper {
         dto.setReleased(metadata.getReleased());
         dto.setRuntime(metadata.getRuntime());
         dto.setImdbVotes(metadata.getImdbVotes());
+        dto.setRated(metadata.getRated());
+        dto.setAwards(metadata.getAwards());
+        dto.setBoxOffice(metadata.getBoxOffice());
+        dto.setMetascore(metadata.getMetascore());
+        dto.setImdbID(metadata.getImdbID());
         return dto;
     }
     public Metadata toEntity(MetadataRequestDto requestDto) {

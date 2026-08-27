@@ -1,12 +1,13 @@
 package com.saattech.service.implementation;
 
-import com.saattech.config.TmdbProperties;
+import com.saattech.config.properties.TmdbProperties;
 import com.saattech.dto.tmdb.TmdbFindResponseDto;
 import com.saattech.dto.tmdb.TmdbVideoResponseDto;
 import com.saattech.entity.Content;
 import com.saattech.entity.Trailer;
 import com.saattech.enums.ContentType;
 import com.saattech.exception.ResourceNotFoundException;
+import com.saattech.mapper.TrailerMapper;
 import com.saattech.service.TmdbService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.util.List;
 public class TmdbServiceImpl implements TmdbService {
     private final RestTemplate restTemplate;
     private final TmdbProperties tmdbProperties;
+    private final TrailerMapper trailerMapper;
 
     @Override
     public Long findTmdbIdByImdbId(String imdbId) {
@@ -69,15 +71,10 @@ public class TmdbServiceImpl implements TmdbService {
                 continue;
             }
 
-            Trailer trailer = new Trailer();
-            trailer.setName(result.getName());
-            trailer.setYoutubeKey(result.getKey());
-            trailer.setSite(result.getSite());
-            trailer.setType(result.getType());
-            trailer.setSize(result.getSize());
-            trailer.setLanguage(result.getLanguage());
-            trailer.setContent(content);
-            trailers.add(trailer);
+            Trailer trailer = trailerMapper.toEntity(result, content);
+            if (trailer != null) {
+                trailers.add(trailer);
+            }
         }
 
         log.info("Fetched {} YouTube trailers from TMDB for IMDB ID: {}", trailers.size(), imdbId);

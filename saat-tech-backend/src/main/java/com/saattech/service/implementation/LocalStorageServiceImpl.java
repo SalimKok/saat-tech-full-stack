@@ -1,12 +1,11 @@
 package com.saattech.service.implementation;
 
-import com.saattech.config.StorageProperties;
+import com.saattech.config.properties.StorageProperties;
 import com.saattech.service.StorageService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,7 +55,7 @@ public class LocalStorageServiceImpl implements StorageService {
             String newFilename = UUID.randomUUID().toString() + extension;
             Path destinationFile = this.rootLocation.resolve(Paths.get(newFilename)).normalize().toAbsolutePath();
             Files.copy(file.getInputStream(), destinationFile);
-            return "/uploads/" + newFilename;
+            return storageProperties.getUrlPrefix() + "/" + newFilename;
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file.", e);

@@ -1,5 +1,9 @@
-package com.saattech.dto.response;
+package com.saattech.dto.content;
 
+import com.saattech.dto.contentcast.ContentCastResponseDto;
+import com.saattech.dto.license.LicenseResponseDto;
+import com.saattech.dto.metadata.MetadataResponseDto;
+import com.saattech.dto.trailer.TrailerResponseDto;
 import com.saattech.enums.ContentStatus;
 import com.saattech.enums.ContentType;
 import lombok.Data;

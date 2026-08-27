@@ -1,7 +1,7 @@
 package com.saattech.config;
 
+import com.saattech.config.properties.StorageProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -30,7 +30,7 @@ public class CorsConfig implements WebMvcConfigurer {
         Path uploadPath = Paths.get(storageProperties.getUploadDir());
         String uploadAbsolutePath = uploadPath.toFile().getAbsolutePath();
 
-        registry.addResourceHandler("/uploads/**")
+        registry.addResourceHandler(storageProperties.getUrlPrefix() + "/**")
                 .addResourceLocations("file:" + uploadAbsolutePath + "/");
     }
 }

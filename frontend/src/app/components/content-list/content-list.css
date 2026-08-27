@@ -76,11 +76,10 @@
   gap: 12px;
 }
 
-/* Premium Card Design */
 .premium-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px; /* Köşeler artık çok daha oval */
+  border-radius: 20px; 
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   overflow: hidden;
@@ -97,7 +96,6 @@
   border-color: rgba(99, 102, 241, 0.4);
 }
 
-/* Poster Styling: aspect-ratio changed to 1 / 1.25 (Super compact vertical height) */
 .card-poster {
   width: 100%;
   aspect-ratio: 1 / 1.25; 
@@ -149,9 +147,8 @@
   transform: translateY(0);
 }
 
-/* Card Body Typography and Spacing */
 .card-body {
-  padding: 16px; /* İçerik boşluğu artırıldı */
+  padding: 16px; 
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -235,7 +232,6 @@
   margin-top: auto;
 }
 
-/* Pagination: Fixed layout and styling */
 .premium-pagination {
   display: flex;
   justify-content: center;
@@ -281,7 +277,6 @@
   color: var(--text-muted);
 }
 
-/* Utilities */
 .premium-box {
   background: rgba(30, 30, 30, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -311,4 +306,55 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.card-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  opacity: 0; 
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 20; 
+}
+
+.movie-card:hover .card-actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.action-btn {
+  background: rgba(10, 10, 15, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ccc;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; 
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  font-size: 13px; 
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.action-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.action-btn.edit-btn:hover {
+  background: #3b82f6; 
+  color: white;
+  border-color: #60a5fa;
+  transform: scale(1.05); 
+}
+.action-btn.delete-btn:hover {
+  background: #e50914; 
+  color: white;
+  border-color: #ff4d4d;
+  transform: scale(1.05);
 }

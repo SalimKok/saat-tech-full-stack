@@ -1,5 +1,5 @@
 package com.saattech.elasticsearch.helper;
-import com.saattech.config.SearchProperties;
+import com.saattech.config.properties.SearchProperties;
 import com.saattech.elasticsearch.dto.MatchExplanationDto;
 import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.specification.dto.ContentFilterDto;

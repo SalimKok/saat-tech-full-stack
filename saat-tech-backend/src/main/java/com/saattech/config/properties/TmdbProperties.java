@@ -1,4 +1,4 @@
-package com.saattech.config;
+package com.saattech.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "tmdb.api")
 public class TmdbProperties {
-
-    private String baseUrl = "https://api.themoviedb.org/3";
+    private String baseUrl;
     private String apiKey;
 }

@@ -1,4 +1,4 @@
-package com.saattech.config;
+package com.saattech.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,5 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "app.storage")
 public class StorageProperties {
-    private String uploadDir = "uploads";
+    private String uploadDir;
+    private String urlPrefix;
 }

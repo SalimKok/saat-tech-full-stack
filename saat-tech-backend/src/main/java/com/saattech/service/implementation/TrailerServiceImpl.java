@@ -1,6 +1,6 @@
 package com.saattech.service.implementation;
 
-import com.saattech.dto.response.TrailerResponseDto;
+import com.saattech.dto.trailer.TrailerResponseDto;
 import com.saattech.entity.Content;
 import com.saattech.entity.Trailer;
 import com.saattech.enums.ContentStatus;

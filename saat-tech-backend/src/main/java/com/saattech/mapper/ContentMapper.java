@@ -1,9 +1,9 @@
 package com.saattech.mapper;
 
-import com.saattech.dto.request.ContentRequestDto;
-import com.saattech.dto.response.ContentCastResponseDto;
-import com.saattech.dto.response.ContentResponseDto;
-import com.saattech.dto.response.LicenseResponseDto;
+import com.saattech.dto.content.ContentRequestDto;
+import com.saattech.dto.contentcast.ContentCastResponseDto;
+import com.saattech.dto.content.ContentResponseDto;
+import com.saattech.dto.license.LicenseResponseDto;
 import com.saattech.entity.Cast;
 import com.saattech.entity.Content;
 import com.saattech.entity.ContentCast;

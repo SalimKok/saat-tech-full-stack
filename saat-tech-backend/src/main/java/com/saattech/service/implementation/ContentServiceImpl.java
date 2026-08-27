@@ -1,10 +1,9 @@
 package com.saattech.service.implementation;
 
-import com.saattech.dto.request.ContentCastRequestDto;
-import com.saattech.dto.request.ContentRequestDto;
-import com.saattech.dto.request.MetadataRequestDto;
-import com.saattech.dto.response.ContentResponseDto;
-import com.saattech.elasticsearch.service.ContentSearchService;
+import com.saattech.dto.contentcast.ContentCastRequestDto;
+import com.saattech.dto.content.ContentRequestDto;
+import com.saattech.dto.metadata.MetadataRequestDto;
+import com.saattech.dto.content.ContentResponseDto;
 import com.saattech.entity.Cast;
 import com.saattech.entity.Content;
 import com.saattech.entity.ContentCast;
@@ -21,7 +20,6 @@ import com.saattech.repository.CastRepository;
 import com.saattech.repository.ContentRepository;
 import com.saattech.exception.ResourceNotFoundException;
 import com.saattech.service.ContentService;
-import com.saattech.service.LicenseService;
 import com.saattech.service.MetadataService;
 import com.saattech.specification.builder.ContentSpecificationBuilder;
 import com.saattech.specification.dto.ContentFilterDto;

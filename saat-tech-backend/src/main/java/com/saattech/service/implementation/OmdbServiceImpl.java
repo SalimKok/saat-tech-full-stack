@@ -1,12 +1,12 @@
 package com.saattech.service.implementation;
 
-import com.saattech.config.OmdbProperties;
+import com.saattech.config.properties.OmdbProperties;
 import com.saattech.dto.omdb.OmdbResponseDto;
-import com.saattech.dto.request.CastRequestDto;
-import com.saattech.dto.request.ContentCastRequestDto;
-import com.saattech.dto.request.ContentRequestDto;
-import com.saattech.dto.response.BulkImportResponseDto;
-import com.saattech.dto.response.CastResponseDto;
+import com.saattech.dto.cast.CastRequestDto;
+import com.saattech.dto.contentcast.ContentCastRequestDto;
+import com.saattech.dto.content.ContentRequestDto;
+import com.saattech.dto.bulkimport.BulkImportResponseDto;
+import com.saattech.dto.cast.CastResponseDto;
 import com.saattech.enums.CastType;
 import com.saattech.exception.ResourceNotFoundException;
 import com.saattech.mapper.OmdbMapper;
@@ -33,7 +33,7 @@ public class OmdbServiceImpl implements OmdbService {
 
     @Override
     public ContentRequestDto fetchFromOmdb(String imdbId) {
-        String requestUrl = configValues.getApiUrl() + "?apikey=" + configValues.getApiKey() + "&i=" + imdbId;
+        String requestUrl = configValues.getUrl() + "?apikey=" + configValues.getKey() + "&i=" + imdbId;
         OmdbResponseDto responseDto = restTemplate.getForObject(requestUrl, OmdbResponseDto.class);
         ContentRequestDto requestDto = omdbMapper.toContentRequestDto(responseDto);
         if (requestDto == null) {

@@ -1,7 +1,7 @@
 package com.saattech.mapper;
 
-import com.saattech.dto.request.LicenseRequestDto;
-import com.saattech.dto.response.LicenseResponseDto;
+import com.saattech.dto.license.LicenseRequestDto;
+import com.saattech.dto.license.LicenseResponseDto;
 import com.saattech.entity.License;
 import org.mapstruct.Mapper;
 

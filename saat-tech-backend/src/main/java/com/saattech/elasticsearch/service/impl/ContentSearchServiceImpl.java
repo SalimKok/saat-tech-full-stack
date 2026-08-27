@@ -1,6 +1,6 @@
 package com.saattech.elasticsearch.service.impl;
 
-import com.saattech.config.SearchProperties;
+import com.saattech.config.properties.SearchProperties;
 import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.elasticsearch.builder.ContentQueryBuilder;
 import com.saattech.elasticsearch.helper.ReciprocalRankFusionHelper;

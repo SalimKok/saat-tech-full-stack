@@ -1,6 +1,6 @@
 package com.saattech.service.implementation;
 
-import com.saattech.dto.request.MetadataRequestDto;
+import com.saattech.dto.metadata.MetadataRequestDto;
 import com.saattech.entity.Metadata;
 import com.saattech.mapper.MetadataMapper;
 import com.saattech.repository.MetadataRepository;

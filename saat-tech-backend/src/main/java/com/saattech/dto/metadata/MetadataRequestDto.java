@@ -1,6 +1,5 @@
-package com.saattech.dto.request;
+package com.saattech.dto.metadata;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

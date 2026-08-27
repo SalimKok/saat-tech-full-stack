@@ -1,6 +1,6 @@
 package com.saattech.service;
 
-import com.saattech.dto.request.MetadataRequestDto;
+import com.saattech.dto.metadata.MetadataRequestDto;
 import com.saattech.entity.Metadata;
 
 public interface MetadataService {

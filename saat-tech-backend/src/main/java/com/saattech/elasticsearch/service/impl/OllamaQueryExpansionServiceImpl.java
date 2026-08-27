@@ -1,6 +1,6 @@
 package com.saattech.elasticsearch.service.impl;
 
-import com.saattech.config.SearchProperties;
+import com.saattech.config.properties.SearchProperties;
 import com.saattech.elasticsearch.service.QueryExpansionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

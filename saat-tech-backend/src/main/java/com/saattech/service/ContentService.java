@@ -1,12 +1,10 @@
 package com.saattech.service;
 
-import com.saattech.dto.request.ContentRequestDto;
-import com.saattech.dto.response.ContentResponseDto;
+import com.saattech.dto.content.ContentRequestDto;
+import com.saattech.dto.content.ContentResponseDto;
 import com.saattech.enums.CastType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface ContentService {
 

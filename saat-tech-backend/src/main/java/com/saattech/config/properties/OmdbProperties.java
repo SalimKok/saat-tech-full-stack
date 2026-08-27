@@ -1,12 +1,14 @@
-package com.saattech.config;
+package com.saattech.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@Data
 @Configuration
-@ConfigurationProperties(prefix = "jwt")
-public class JwtProperties {
-    private String secret;
+@Data
+@ConfigurationProperties(prefix = "omdb.api")
+public class OmdbProperties {
+    private String url;
+    private String key;
+
 }

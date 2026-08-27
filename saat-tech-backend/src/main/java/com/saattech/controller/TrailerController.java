@@ -1,6 +1,6 @@
 package com.saattech.controller;
 
-import com.saattech.dto.response.TrailerResponseDto;
+import com.saattech.dto.trailer.TrailerResponseDto;
 import com.saattech.security.IsAdmin;
 import com.saattech.service.TrailerService;
 import lombok.RequiredArgsConstructor;

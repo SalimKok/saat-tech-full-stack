@@ -1,6 +1,6 @@
 package com.saattech.security;
 
-import com.saattech.config.JwtProperties;
+import com.saattech.config.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

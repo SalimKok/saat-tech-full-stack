@@ -1,5 +1,6 @@
-package com.saattech.dto.response;
+package com.saattech.dto.contentcast;
 
+import com.saattech.dto.cast.CastResponseDto;
 import com.saattech.enums.CastType;
 import lombok.Data;
 
