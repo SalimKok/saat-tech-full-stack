@@ -39,19 +39,21 @@ public class LocalStorageServiceImpl implements StorageService {
             }
 
             String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                throw new RuntimeException("Security violation: Only image files are allowed.");
+            if (contentType == null || (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
+                throw new RuntimeException("Security violation: Only image and video files are allowed.");
             }
+
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
             }
 
-            java.util.List<String> allowedExtensions = java.util.Arrays.asList(".jpg", ".jpeg", ".png", ".webp");
+            java.util.List<String> allowedExtensions = java.util.Arrays.asList(".jpg", ".jpeg", ".png", ".webp", ".mp4", ".webm");
             if (!allowedExtensions.contains(extension)) {
-                throw new RuntimeException("Unsupported file format. Only JPG, PNG, or WEBP are allowed.");
+                throw new RuntimeException("Unsupported file format. Only JPG, PNG, WEBP, MP4 or WEBM are allowed.");
             }
+
             String newFilename = UUID.randomUUID().toString() + extension;
             Path destinationFile = this.rootLocation.resolve(Paths.get(newFilename)).normalize().toAbsolutePath();
             Files.copy(file.getInputStream(), destinationFile);

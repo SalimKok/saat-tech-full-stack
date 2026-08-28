@@ -8,4 +8,5 @@ export interface TrailerDto {
   type: string;
   size: number;
   language: string;
+  fileUrl?: string; 
 }

@@ -14,4 +14,5 @@ public class TrailerResponseDto {
     private String type;
     private Integer size;
     private String language;
+    private String fileUrl;
 }

@@ -1,0 +1,19 @@
+.video-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.video-js .vjs-control-bar {
+  background-color: rgba(26, 26, 32, 0.9); 
+}
+
+.video-js .vjs-big-play-button {
+  background-color: rgba(0, 123, 255, 0.8); 
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+}

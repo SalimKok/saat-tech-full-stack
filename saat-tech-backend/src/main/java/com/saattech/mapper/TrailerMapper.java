@@ -1,5 +1,6 @@
 package com.saattech.mapper;
 
+import com.saattech.dto.tmdb.TmdbSaveRequestDto;
 import com.saattech.dto.trailer.TrailerResponseDto;
 import com.saattech.entity.Trailer;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,7 @@ public class TrailerMapper {
         dto.setType(trailer.getType());
         dto.setSize(trailer.getSize());
         dto.setLanguage(trailer.getLanguage());
+        dto.setFileUrl(trailer.getFileUrl());
 
         if (trailer.getYoutubeKey() != null) {
             dto.setYoutubeEmbedUrl(YOUTUBE_EMBED_BASE + trailer.getYoutubeKey());
@@ -62,6 +64,33 @@ public class TrailerMapper {
         trailer.setLanguage(result.getLanguage());
         trailer.setContent(content);
 
+        return trailer;
+    }
+
+    public Trailer toEntity(TmdbSaveRequestDto request, Content content) {
+        if (request == null) {
+            return null;
+        }
+        Trailer trailer = new Trailer();
+        trailer.setContent(content);
+        trailer.setName(request.getName());
+        trailer.setYoutubeKey(request.getYoutubeKey());
+        trailer.setSite(request.getSite());
+        trailer.setType(request.getType());
+        trailer.setSize(request.getSize());
+        trailer.setLanguage(request.getLanguage());
+        return trailer;
+    }
+
+    public Trailer toEntityForLocalUpload(Content content, String name, String type, String fileUrl, long size) {
+        Trailer trailer = new Trailer();
+        trailer.setContent(content);
+        trailer.setName(name);
+        trailer.setType(type);
+        trailer.setFileUrl(fileUrl);
+        trailer.setSize((int) size);
+        trailer.setSite("Local");
+        trailer.setYoutubeKey("");
         return trailer;
     }
 

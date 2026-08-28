@@ -2,8 +2,6 @@ package com.saattech.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -21,11 +19,14 @@ public class Trailer {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String youtubeKey;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String site;
+
+    @Column(name = "file_url")
+    private String fileUrl;
 
     private String type;
 
@@ -38,7 +39,5 @@ public class Trailer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id", nullable = false)
-    //@ToString.Exclude
-    //@EqualsAndHashCode.Exclude
     private Content content;
 }

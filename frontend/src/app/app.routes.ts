@@ -5,7 +5,7 @@ import { AuthCallbackComponent } from './core/auth-callback/auth-callback';
 import { authGuard } from './core/guards/auth-guard';
 import { CastList } from './components/cast-list/cast-list';
 import { CastForm } from './components/cast-form/cast-form';
-import { ContentDetailComponent } from './components/content-detail/content-detail';
+import { ContentManagerDashboard } from './components/content-manager-dashboard/content-manager-dashboard';
 
 export const routes: Routes = [
   { path: 'auth-callback', component: AuthCallbackComponent },
@@ -15,7 +15,7 @@ export const routes: Routes = [
   { path: 'casts', component: CastList, canActivate: [authGuard] },
   { path: 'casts/add', component: CastForm, canActivate: [authGuard] },
   { path: 'casts/edit/:id', component: CastForm, canActivate: [authGuard] },
-   { path: 'content/:id', component: ContentDetailComponent, canActivate: [authGuard] },
+   { path: 'content/:id', component: ContentManagerDashboard, canActivate: [authGuard] },
 
   { path: '', redirectTo: 'movies', pathMatch: 'full' }
 ];
