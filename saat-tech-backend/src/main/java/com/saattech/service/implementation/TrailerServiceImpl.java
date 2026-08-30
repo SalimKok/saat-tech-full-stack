@@ -126,14 +126,46 @@ public class TrailerServiceImpl implements TrailerService {
 
     @Transactional
     @Override
-    public TrailerResponseDto updateTrailerType(Long contentId, Long trailerId, String newType) {
+    public TrailerResponseDto updateTrailerDetails(Long contentId, Long trailerId, String newName, String newType) {
         Trailer trailer = trailerRepository.findById(trailerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trailer not found! ID: " + trailerId));
         if (!trailer.getContent().getId().equals(contentId)) {
             throw new IllegalStateException("This trailer does not belong to the specified content!");
         }
-        trailer.setType(newType);
+
+        if (newName != null && !newName.isBlank()) {
+            trailer.setName(newName);
+        }
+
+        if (newType != null && !newType.isBlank()) {
+            trailer.setType(newType);
+        }
+
         Trailer updatedTrailer = trailerRepository.save(trailer);
         return trailerMapper.toDto(updatedTrailer);
     }
+
+    @Transactional
+    @Override
+    public void deleteTrailer(Long contentId, Long trailerId) {
+        Trailer trailer = trailerRepository.findById(trailerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trailer not found! ID: " + trailerId));
+
+        if (!trailer.getContent().getId().equals(contentId)) {
+            throw new IllegalStateException("This trailer does not belong to the specified content!");
+        }
+
+        if ("Local".equals(trailer.getSite()) && trailer.getFileUrl() != null && !trailer.getFileUrl().isBlank()) {
+            try {
+                storageService.delete(trailer.getFileUrl());
+                log.info("Deleted physical file for trailer: {}", trailer.getFileUrl());
+            } catch (Exception e) {
+                log.error("Failed to delete physical file for trailer ID {}. Error: {}", trailerId, e.getMessage());
+            }
+        }
+
+        trailerRepository.delete(trailer);
+        log.info("Deleted trailer DB record ID: {}", trailerId);
+    }
+
 }

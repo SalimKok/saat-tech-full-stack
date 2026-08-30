@@ -1,10 +1,22 @@
-<div class="dashboard-container" *ngIf="contentData">
+<div class="dashboard-container" *ngIf="contentId">
+  
   <header class="dashboard-header">
     <div class="header-content">
-      <button class="back-btn" routerLink="/movies">
-        <i class="fas fa-arrow-left"></i> Back to Movie List
+      <!-- OK İŞARETİ DAHA BELİRGİN (MAVİ) YAPILDI -->
+      <button class="back-btn" routerLink="/movies" style="color: #007bff; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">
+        &#8592; Back to Movie List
       </button>
-      <h2>{{ contentData.metadata?.title || 'Unknown Title' }} <span>Content Management Panel</span></h2>
+      <h2>Content Management Panel <span>(ID: {{ contentId }})</span></h2>
+    </div>
+
+    <!-- SAĞ KÖŞE: EDIT VE DELETE BUTONLARI -->
+    <div class="header-actions" style="display: flex; gap: 12px; margin-top: 15px;">
+      <button class="btn btn-outline" (click)="openEditModal()" style="color: #ffc107; border-color: #ffc107;" onmouseover="this.style.background='#ffc107'; this.style.color='#111'" onmouseout="this.style.background='transparent'; this.style.color='#ffc107'">
+        <i class="fas fa-edit"></i> Edit Content
+      </button>
+      <button class="btn btn-outline" (click)="deleteContent()" style="color: #ff4757; border-color: #ff4757;" onmouseover="this.style.background='#ff4757'; this.style.color='#fff'" onmouseout="this.style.background='transparent'; this.style.color='#ff4757'">
+        <i class="fas fa-trash-alt"></i> Delete
+      </button>
     </div>
   </header>
 
@@ -18,145 +30,23 @@
   </nav>
 
   <main class="tab-content">
-    
-    <div class="tab-pane" *ngIf="activeTab === 'general'">
-      <h3>General Content Form</h3>
-      <p class="text-muted">Editable input forms (Title, Plot, Release Date, etc.) will go here.</p>
-    </div>
+    <app-content-general-info 
+      *ngIf="activeTab === 'general'" 
+      [contentId]="contentId">
+    </app-content-general-info>
 
-    <div class="tab-pane" *ngIf="activeTab === 'media'">
-      
-      <div class="media-section" style="background: #1e1e2d; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h4>Video Management</h4>
-        <input type="file" #fileInput (change)="onFileSelected($event)" accept="video/mp4,video/webm" style="display: none;">
-        <button class="btn btn-primary mt-2" (click)="fileInput.click()">
-          <i class="fas fa-upload"></i> Upload Physical Video (.mp4)
-        </button>
-
-        <div class="mt-3" *ngIf="activeVideoUrl">
-          <p class="text-muted">Preview of physical video:</p>
-          <app-video-player [src]="activeVideoUrl" type="video/mp4"></app-video-player>
-        </div>
-
-        <div class="mt-3" *ngIf="activeYoutubeUrl">
-          <p class="text-muted" style="color: #ffc107;">YouTube Preview:</p>
-          <iframe 
-            [src]="activeYoutubeUrl" 
-            width="100%" 
-            height="450" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen 
-            style="border-radius: 8px;">
-          </iframe>
-        </div>
-
-        <div class="mt-4" *ngIf="selectedTmdbVideo" style="background: #2a2a3c; padding: 1.5rem; border-radius: 8px; border: 1px dashed #ffc107;">
-          <h4 style="color: #ffc107; margin-bottom: 1rem;">
-            <i class="fas fa-edit"></i> 
-            Edit {{ selectedTmdbVideo.site === 'Local' ? 'Local Physical' : 'TMDB' }} Video Before Saving
-          </h4>
-          
-          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-            <div style="flex: 2;">
-              <label style="display: block; margin-bottom: 5px; color: #ccc;">Video Name</label>
-              <input type="text" 
-                     [value]="selectedTmdbVideo.name" 
-                     (input)="updateSelectedName($event)" 
-                     style="width: 100%; padding: 8px; background: #1e1e2d; color: white; border: 1px solid #444; border-radius: 4px;">
-            </div>
-            
-            <div style="flex: 1;">
-              <label style="display: block; margin-bottom: 5px; color: #ccc;">Type (Tag)</label>
-              <select [value]="selectedTmdbVideo.type" 
-                      (change)="updateSelectedType($event)" 
-                      style="width: 100%; padding: 8px; background: #1e1e2d; color: white; border: 1px solid #444; border-radius: 4px;">
-                <option *ngFor="let type of videoTypes" [value]="type" [selected]="type === selectedTmdbVideo.type">
-                  {{ type }}
-                </option>
-              </select>
-            </div>
-          </div>
-          
-          <div style="display: flex; gap: 10px;">
-            <button class="btn btn-outline" (click)="cancelEdit()" style="flex: 1; padding: 10px; font-weight: bold; border-radius: 4px; border: 1px solid #dc3545; color: #dc3545; background: transparent; cursor: pointer;">
-              <i class="fas fa-times"></i> Cancel
-            </button>
-            <button (click)="confirmAndSaveTmdbVideo()" style="flex: 2; padding: 10px; font-weight: bold; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
-              <i class="fas fa-save"></i> Save to Database
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="media-section" style="margin-bottom: 3rem;">
-        <h3>Saved Database Media</h3>
-        <table class="table" style="width: 100%; text-align: left; margin-top: 1rem; color: #fff;">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Source</th>
-              <th>Type (Tag)</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let trailer of savedTrailers" style="border-bottom: 1px solid #333;">
-              <td style="padding: 10px 0;">{{ trailer.name }}</td>
-              <td>
-                <span class="badge" [style.background]="trailer.site === 'Local' ? '#007bff' : '#dc3545'">
-                  {{ trailer.site }}
-                </span>
-              </td>
-              
-              <td style="color: #ffc107; font-weight: bold;">
-                {{ trailer.type }}
-              </td>
-              
-              <td>
-                <div style="display: flex; gap: 5px;">
-                  <button class="btn btn-outline btn-sm" (click)="playSavedVideo(trailer)">
-                    <i class="fas fa-play"></i> Watch
-                  </button>
-                  <button class="btn btn-primary btn-sm" (click)="editSavedVideo(trailer)">
-                    <i class="fas fa-edit"></i> Edit
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="savedTrailers.length === 0">
-              <td colspan="4" class="text-muted" style="padding: 1rem 0;">No media saved in the database yet.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="media-section" style="border-top: 1px dashed #444; padding-top: 2rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3>TMDB Previews</h3>
-          <button class="btn btn-outline" (click)="fetchTmdbPreviews()">
-            <i class="fas fa-cloud-download-alt"></i> Fetch from TMDB
-          </button>
-        </div>
-        
-        <div class="tmdb-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
-          <div *ngFor="let tmdb of tmdbPreviews" class="tmdb-card" style="background: #2a2a3c; padding: 1rem; border-radius: 8px;">
-            <img *ngIf="tmdb.youtubeThumbnailUrl" [src]="tmdb.youtubeThumbnailUrl" alt="Thumbnail" style="width: 100%; border-radius: 4px; margin-bottom: 10px;">
-            <p style="font-weight: bold; margin-bottom: 5px;">{{ tmdb.name }}</p>
-            <p class="text-muted" style="font-size: 12px; margin-bottom: 10px;">{{ tmdb.type }} - {{ tmdb.site }}</p>
-            <button class="btn btn-sm" style="width: 100%; background: #ffc107; color: #111; border: none; font-weight: bold;" (click)="inspectTmdbVideo(tmdb)">
-              <i class="fas fa-search"></i> Inspect & Edit
-            </button>
-          </div>
-        </div>
-        <p *ngIf="tmdbPreviews.length === 0" class="text-muted mt-2">Click the fetch button to see available TMDB videos.</p>
-      </div>
-
-    </div>
+    <app-content-media-manager 
+      *ngIf="activeTab === 'media'" 
+      [contentId]="contentId">
+    </app-content-media-manager>
   </main>
-</div>
 
-<div class="loading-state" *ngIf="!contentData">
-  <div class="spinner"></div>
-  <p>Loading dashboard data...</p>
+  <!-- HAZIR EDİT MODALIMIZ (Ekranda Gizli Bekler, Tıklanınca Açılır) -->
+  <app-edit-modal 
+    *ngIf="selectedMovie" 
+    [movie]="selectedMovie" 
+    (closed)="onModalClosed()" 
+    (saved)="onMovieSaved()">
+  </app-edit-modal>  
+
 </div>

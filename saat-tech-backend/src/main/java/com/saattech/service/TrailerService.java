@@ -16,13 +16,11 @@ public interface TrailerService {
 
     TrailerResponseDto uploadAndSaveTrailer(Long contentId, MultipartFile file, String name, String type);
 
-    // TMDB'den videoları veritabanına KAYDETMEDEN sadece önizleme olarak getirir
     List<TrailerResponseDto> previewTmdbTrailers(Long contentId);
 
-    // Seçilen tek bir TMDB videosunu veritabanına kaydeder
     TrailerResponseDto saveSingleTmdbTrailer(Long contentId, TmdbSaveRequestDto request);
 
-    // Mevcut bir videonun etiketini (Trailer, Teaser vs.) günceller
-    TrailerResponseDto updateTrailerType(Long contentId, Long trailerId, String newType);
+    TrailerResponseDto updateTrailerDetails(Long contentId, Long trailerId, String newName, String newType);
 
+    void deleteTrailer(Long contentId, Long trailerId);
 }

@@ -64,15 +64,23 @@ public class TrailerController {
         return ResponseEntity.ok(savedTrailer);
     }
 
-    @PatchMapping("/{contentId}/trailers/{trailerId}/type")
-    public ResponseEntity<TrailerResponseDto> updateTrailerType(
+    @PatchMapping("/{contentId}/trailers/{trailerId}")
+    public ResponseEntity<TrailerResponseDto> updateTrailerDetails(
             @PathVariable Long contentId,
             @PathVariable Long trailerId,
             @RequestBody Map<String, String> payload) {
-
+        String newName = payload.get("name");
         String newType = payload.get("type");
-        TrailerResponseDto updatedTrailer = trailerService.updateTrailerType(contentId, trailerId, newType);
+        TrailerResponseDto updatedTrailer = trailerService.updateTrailerDetails(contentId, trailerId, newName, newType);
         return ResponseEntity.ok(updatedTrailer);
+    }
+
+    @DeleteMapping("/{contentId}/trailers/{trailerId}")
+    public ResponseEntity<Void> deleteTrailer(
+            @PathVariable Long contentId,
+            @PathVariable Long trailerId) {
+        trailerService.deleteTrailer(contentId, trailerId);
+        return ResponseEntity.noContent().build();
     }
 
 }

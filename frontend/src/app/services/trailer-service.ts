@@ -37,7 +37,12 @@ export class TrailerService {
     return this.http.post<TrailerDto>(`${this.apiUrl}/${contentId}/trailers/tmdb-save`, trailerData);
   }
  
-  updateTrailerType(contentId: number, trailerId: number, newType: string): Observable<TrailerDto> {
-    return this.http.patch<TrailerDto>(`${this.apiUrl}/${contentId}/trailers/${trailerId}/type`, { type: newType });
+  updateTrailerDetails(contentId: number, trailerId: number, name: string, type: string): Observable<TrailerDto> {
+    const payload = { name, type };
+    return this.http.patch<TrailerDto>(`${this.apiUrl}/${contentId}/trailers/${trailerId}`, payload);
   }
+  deleteTrailer(contentId: number, trailerId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${contentId}/trailers/${trailerId}`);
+  }
+
 }

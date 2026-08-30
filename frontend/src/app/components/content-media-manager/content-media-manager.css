@@ -1,0 +1,158 @@
+/* Ana Kutular */
+.media-box {
+  background: #1e1e2d;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+.hidden-input { display: none; }
+.preview-title { color: #ffc107; }
+.iframe-preview { border-radius: 8px; }
+
+/* Düzenleme (Edit) Paneli */
+.edit-panel {
+  background: #2a2a3c;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px dashed #ffc107;
+}
+.edit-panel-title {
+  color: #ffc107;
+  margin-bottom: 1rem;
+}
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.form-group-large { flex: 2; }
+.form-group-small { flex: 1; }
+.input-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ccc;
+}
+.custom-input, .custom-select {
+  width: 100%;
+  padding: 8px;
+  background: #1e1e2d;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+/* Aksiyon Butonları (Kaydet/İptal) */
+.action-row {
+  display: flex;
+  gap: 10px;
+}
+.btn-cancel {
+  flex: 1;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 4px;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  background: transparent;
+  cursor: pointer;
+}
+.btn-save {
+  flex: 2;
+  padding: 10px;
+  font-weight: bold;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Veritabanı Tablosu */
+.media-table {
+  width: 100%;
+  text-align: left;
+  margin-top: 1rem;
+  color: #fff;
+}
+.table-row { border-bottom: 1px solid #333; }
+.table-cell-name { padding: 15px 0; font-weight: 500; }
+.table-cell-source { color: #ccc; }
+.table-cell-type { color: #ffc107; font-weight: bold; }
+.table-actions { display: flex; gap: 8px; }
+
+/* Tablo Butonları ve Hover Efektleri */
+.action-btn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #ddd;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
+}
+.action-btn:hover { background: #333; }
+.delete-btn {
+  background: transparent;
+  border: 1px solid #ff4757;
+  color: #ff4757;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
+}
+.delete-btn:hover { background: rgba(255, 71, 87, 0.1); }
+
+/* TMDB Alanı ve Grid Sistemi */
+.tmdb-section {
+  border-top: 1px dashed #444;
+  padding-top: 2rem;
+}
+.tmdb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tmdb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.tmdb-card {
+  background: #2a2a3c;
+  padding: 1rem;
+  border-radius: 8px;
+}
+.tmdb-thumbnail {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.tmdb-card-title { font-weight: bold; margin-bottom: 5px; }
+.tmdb-card-subtitle { font-size: 12px; margin-bottom: 10px; }
+.btn-inspect {
+  width: 100%;
+  background: #ffc107;
+  color: #111;
+  border: none;
+  font-weight: bold;
+}
+
+/* Sayfalandırma (Pagination) */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 1.5rem;
+}
+.btn-page { padding: 5px 15px; cursor: pointer; }
+.page-indicator {
+  color: #ffc107;
+  font-weight: bold;
+  background: #1e1e2d;
+  padding: 5px 15px;
+  border-radius: 4px;
+}

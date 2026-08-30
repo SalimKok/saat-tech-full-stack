@@ -1,0 +1,91 @@
+<div class="general-info-section" *ngIf="contentData">
+
+  <!-- SOL KISIM: Film Afişi (Poster) -->
+  <div class="poster-container">
+    <img *ngIf="contentData.metadata?.poster" [src]="contentData.metadata.poster" alt="Poster" class="poster-image">
+    
+    <div *ngIf="!contentData.metadata?.poster" class="poster-placeholder">
+      <i class="fas fa-image fa-4x"></i>
+    </div>
+  </div>
+
+  <!-- SAĞ KISIM: Detaylar, Oyuncular ve Lisanslar -->
+  <div class="details-container">
+    
+    <!-- Başlık ve Ufak Rozetler -->
+    <div>
+      <h2 class="content-title">
+        {{ contentData.metadata?.title || 'Unknown Title' }} 
+        <span class="release-year">{{ contentData.releaseYear || '' }}</span>
+      </h2>
+      <div class="badges-wrapper">
+        <span class="badge badge-type">{{ contentData.contentType }}</span>
+        
+        <!-- Saat/Süre -->
+        <span class="badge badge-neutral">
+          <i class="fas fa-clock"></i> {{ contentData.metadata?.runtime || 'N/A' }}
+        </span>
+        
+        <!-- GARANTİLİ YILDIZ İŞARETİ EKLENDİ VE SARI YAPILDI -->
+        <span class="badge badge-neutral">
+          <span style="color: #ffc107; font-size: 1.1rem;">&#9733;</span> {{ contentData.metadata?.imdbRating || 'N/A' }}
+        </span>
+        
+        <span class="badge badge-neutral">{{ contentData.metadata?.rated || 'NR' }}</span>
+        
+        <span class="badge" [ngClass]="contentData.status === 'PUBLISHED' ? 'badge-status-published' : 'badge-status-draft'">
+          {{ contentData.status }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Konu / Hikaye (Plot) -->
+    <div class="section-box">
+      <h4 class="section-title"><i class="fas fa-align-left"></i> Overview</h4>
+      <p class="plot-text">{{ contentData.metadata?.plot || 'No overview available for this content.' }}</p>
+    </div>
+
+    <!-- Ekstra Teknik Detaylar -->
+    <div class="section-box metadata-grid">
+      <div>
+        <p class="metadata-item"><span class="metadata-label">Genre: </span> <span class="metadata-value">{{ contentData.metadata?.genre || '-' }}</span></p>
+        <p class="metadata-item"><span class="metadata-label">Language: </span> <span class="metadata-value">{{ contentData.metadata?.language || '-' }}</span></p>
+        <p class="metadata-item"><span class="metadata-label">Country: </span> <span class="metadata-value">{{ contentData.metadata?.country || '-' }}</span></p>
+      </div>
+      <div>
+        <p class="metadata-item"><span class="metadata-label">Awards: </span> <span class="metadata-value">{{ contentData.metadata?.awards || '-' }}</span></p>
+        <p class="metadata-item"><span class="metadata-label">IMDB ID: </span> <span class="metadata-value">{{ contentData.metadata?.imdbID || '-' }}</span></p>
+      </div>
+    </div>
+
+    <!-- Oyuncular ve Lisanslar Yan Yana -->
+    <div class="split-grid">
+      
+      <!-- Casts (Oyuncular) -->
+      <div class="section-box">
+        <h4 class="section-title"><i class="fas fa-users"></i> Top Cast</h4>
+        <div *ngIf="contentData.casts && contentData.casts.length > 0; else noCast">
+          <div *ngFor="let castItem of contentData.casts.slice(0, 5)" class="list-row">
+            <span class="list-item-name">{{ castItem.cast?.name }}</span>
+            <span class="list-item-role">{{ castItem.role }}</span>
+          </div>
+        </div>
+        <ng-template #noCast><p style="color: #888; margin: 0;">No cast information attached.</p></ng-template>
+      </div>
+
+      <!-- Licenses (Lisanslar) -->
+      <div class="section-box">
+        <h4 class="section-title"><i class="fas fa-key"></i> Active Licenses</h4>
+        <div *ngIf="contentData.licenses && contentData.licenses.length > 0; else noLicense">
+          <div *ngFor="let license of contentData.licenses" class="list-row">
+            <span class="list-item-name">{{ license.name || 'Unnamed License' }}</span>
+            <span [style.color]="license.status === 'ACTIVE' ? '#2ed573' : '#ff4757'" style="font-weight: bold; font-size: 13px;">{{ license.status }}</span>
+          </div>
+        </div>
+        <ng-template #noLicense><p style="color: #888; margin: 0;">No licenses attached.</p></ng-template>
+      </div>
+
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,119 @@
+/* Ana Kapsayıcı */
+.general-info-section {
+  display: flex;
+  gap: 2rem;
+  background: transparent;
+}
+
+/* Poster Alanı */
+.poster-container {
+  flex: 0 0 320px;
+}
+.poster-image {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+.poster-placeholder {
+  width: 100%;
+  height: 480px;
+  background: #2a2a3c;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+
+/* Sağ Detaylar Alanı */
+.details-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.content-title {
+  margin: 0 0 10px 0;
+  color: #fff;
+  font-size: 2.2rem;
+}
+.release-year {
+  color: #888;
+  font-weight: normal;
+  font-size: 1.5rem;
+}
+
+/* Rozetler (Badges) */
+.badges-wrapper {
+  display: flex;
+  gap: 12px; /* Aralarını biraz daha açtık */
+  flex-wrap: wrap;
+}
+.badge {
+  padding: 6px 14px; /* Biraz daha dolgunlaştırdık */
+  border-radius: 4px;
+  font-size: 14px; /* 12px'den 14px'e çıkardık, daha okunaklı! */
+  font-weight: 700; /* Çok daha kalın yaptık */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.badge-type { background: #e50914; font-weight: bold; color: white; }
+.badge-neutral { background: #333; color: #fff; } /* Rengini #ccc'den #fff (Bembeyaz) yaptık */
+
+.badge-status-published { background: #2ed573; color: #111; font-weight: bold; }
+.badge-status-draft { background: #ff4757; color: #111; font-weight: bold; }
+
+/* Kutular ve Grid Sistemleri */
+.section-box {
+  background: #1e1e2d;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+.section-title {
+  color: #ffc107;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.plot-text {
+  color: #ddd;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 15px;
+}
+.metadata-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.metadata-item {
+  margin: 0 0 8px 0;
+}
+.metadata-label {
+  color: #ffc107;
+  font-weight: bold;
+}
+.metadata-value {
+  color: #fff;
+}
+.split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Liste Satırları (Casts ve Licenses) */
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #333;
+  padding: 10px 0;
+  color: #ddd;
+}
+.list-item-name {
+  font-weight: 500;
+}
+.list-item-role {
+  color: #888;
+  font-size: 13px;
+}

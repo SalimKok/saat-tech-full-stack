@@ -1,0 +1,126 @@
+<div class="media-box">
+  <h4>Video Management</h4>
+  <input type="file" #fileInput (change)="onFileSelected($event)" accept="video/mp4,video/webm" class="hidden-input">
+  <button class="btn btn-primary mt-2" (click)="fileInput.click()">
+    <i class="fas fa-upload"></i> Upload Physical Video (.mp4)
+  </button>
+
+  <!-- Local Video.js Player -->
+  <div class="mt-3" *ngIf="activeVideoUrl">
+    <p class="text-muted">Preview of physical video:</p>
+    <app-video-player [src]="activeVideoUrl" type="video/mp4"></app-video-player>
+  </div>
+
+  <!-- YouTube (TMDB) Embedded Player -->
+  <div class="mt-3" *ngIf="activeYoutubeUrl">
+    <p class="text-muted preview-title">YouTube Preview:</p>
+    <iframe [src]="activeYoutubeUrl" width="100%" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="iframe-preview"></iframe>
+  </div>
+
+  <!-- TMDB EDIT FORM -->
+  <div class="mt-4 edit-panel" *ngIf="selectedTmdbVideo">
+    <h4 class="edit-panel-title">
+      <i class="fas fa-edit"></i> Edit {{ selectedTmdbVideo.site === 'Local' ? 'Local Physical' : 'TMDB' }} Video Before Saving
+    </h4>
+    
+    <div class="form-row">
+      <div class="form-group-large">
+        <label class="input-label">Video Name</label>
+        <input type="text" [value]="selectedTmdbVideo.name" (input)="updateSelectedName($event)" class="custom-input">
+      </div>
+      
+      <div class="form-group-small">
+        <label class="input-label">Type (Tag)</label>
+        <select [value]="selectedTmdbVideo.type" (change)="updateSelectedType($event)" class="custom-select">
+          <option *ngFor="let type of videoTypes" [value]="type" [selected]="type === selectedTmdbVideo.type">{{ type }}</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="action-row">
+      <button class="btn-cancel" (click)="cancelEdit()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button class="btn-save" (click)="confirmAndSaveTmdbVideo()">
+        <i class="fas fa-save"></i> Save to Database
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- VERİTABANINDAKİ (KAYITLI) VİDEOLAR -->
+<div class="media-box" style="margin-bottom: 3rem;">
+  <h3>Saved Database Media</h3>
+  <table class="table media-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Source</th>
+        <th>Type (Tag)</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let trailer of savedTrailers" class="table-row">
+        <td class="table-cell-name">{{ trailer.name }}</td>
+        <td class="table-cell-source">
+          <i class="fab fa-youtube" *ngIf="trailer.site !== 'Local'" style="color: #ff4757; margin-right: 5px;"></i>
+          <i class="fas fa-hdd" *ngIf="trailer.site === 'Local'" style="color: #2ed573; margin-right: 5px;"></i>
+          {{ trailer.site }}
+        </td>
+        <td class="table-cell-type">{{ trailer.type }}</td>
+        <td>
+          <div class="table-actions">
+            <button (click)="playSavedVideo(trailer)" class="action-btn">
+              <i class="fas fa-play" style="margin-right: 4px;"></i> Watch
+            </button>
+            <button (click)="editSavedVideo(trailer)" class="action-btn">
+              <i class="fas fa-edit" style="margin-right: 4px;"></i> Edit
+            </button>
+            <button (click)="deleteSavedVideo(trailer)" class="delete-btn">
+              <i class="fas fa-trash" style="margin-right: 4px;"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="savedTrailers.length === 0">
+        <td colspan="4" class="text-muted" style="padding: 1rem 0;">No media saved in the database yet.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- TMDB ÖNİZLEME ALANI -->
+<div class="tmdb-section">
+  <div class="tmdb-header">
+    <h3>TMDB Previews</h3>
+    <button class="btn btn-outline" (click)="fetchTmdbPreviews()">
+      <i class="fas fa-cloud-download-alt"></i> Fetch from TMDB
+    </button>
+  </div>
+  
+  <div class="tmdb-grid">
+    <div *ngFor="let tmdb of paginatedTmdbPreviews" class="tmdb-card">
+      <img *ngIf="tmdb.youtubeThumbnailUrl" [src]="tmdb.youtubeThumbnailUrl" alt="Thumbnail" class="tmdb-thumbnail">
+      <p class="tmdb-card-title">{{ tmdb.name }}</p>
+      <p class="text-muted tmdb-card-subtitle">{{ tmdb.type }} - {{ tmdb.site }}</p>
+      <button class="btn btn-sm btn-inspect" (click)="inspectTmdbVideo(tmdb)">
+        <i class="fas fa-search"></i> Inspect & Edit
+      </button>
+    </div>
+  </div>
+  <p *ngIf="tmdbPreviews.length === 0" class="text-muted mt-2">Click the fetch button to see available TMDB videos.</p>
+  
+  <!-- PAGINATION KONTROLLERİ -->
+  <div *ngIf="tmdbPreviews.length > itemsPerPage" class="pagination-container">
+    <button class="btn btn-outline btn-sm btn-page" [disabled]="currentPage === 1" (click)="prevPage()">
+      <i class="fas fa-chevron-left"></i> Previous
+    </button>
+    <span class="page-indicator">
+      Page {{ currentPage }} of {{ totalPages }}
+    </span>
+    <button class="btn btn-outline btn-sm btn-page" [disabled]="currentPage === totalPages" (click)="nextPage()">
+      Next <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>
