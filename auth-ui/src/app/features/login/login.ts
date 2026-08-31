@@ -24,14 +24,14 @@ export class LoginComponent {
 
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
-        if (response && response.token) {
-          const token = response.token;
-          const role = this.authService.getRoleFromToken(token);
+
+        if (response && response.role) {
+          const role = response.role;
 
           if (role === 'ADMIN') {
-            window.location.href = `http://localhost:4200/auth-callback#token=${token}`;
+            window.location.href = `http://localhost:4200/auth-callback`;
           } else {
-            window.location.href = `http://localhost:4201/auth-callback#token=${token}`;
+            window.location.href = `http://localhost:4201/auth-callback`;
           }
         }
       },

@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth-service';
   styleUrl: '../login/login.css' 
 })
 export class RegisterComponent {
-  userData = { username: '', password: '', role: 'USER' };
+  userData = { username: '', password: ''};
   
   errorMessage = '';
   successMessage = '';

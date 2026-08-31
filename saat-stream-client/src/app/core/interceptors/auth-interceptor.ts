@@ -9,16 +9,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenService = inject(TokenService); 
   
   if (isPlatformBrowser(platformId)) {
-    const token = tokenService.getToken();
-    
-    if (token) {
-      req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-    }
+    req = req.clone({
+      withCredentials: true
+    });
   }
+  
   
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {

@@ -10,27 +10,9 @@ import { TokenService } from '../services/token-service';
 
 export class AuthCallbackComponent implements OnInit {
 
-  constructor(
-    private route: ActivatedRoute, 
-    private router: Router,
-    private tokenService: TokenService 
-  ) {}
-
+  constructor(private router: Router) {}
   ngOnInit(): void {
-    this.route.fragment.subscribe(fragment => {
-      
-      if (fragment) {
-        const params = new URLSearchParams(fragment);
-        const token = params.get('token');
-
-        if (token) {
-          this.tokenService.setToken(token);
-          this.router.navigate(['/']); 
-          return;
-        }
-      }
-      
-      window.location.href = 'http://localhost:4202/login';
-    });
+    // Cookie zaten tarayıcıda var, direkt içeri al.
+    this.router.navigate(['/']); 
   }
 }
