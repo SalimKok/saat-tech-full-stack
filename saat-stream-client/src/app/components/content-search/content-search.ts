@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContentSearchService } from '../../services/content-search-service';
 import { ContentIndex, SearchFilter } from '../../models/content-index';
+import { RouterModule } from '@angular/router';
+
 
 @Component({
   selector: 'app-content-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './content-search.html',
   styleUrl: './content-search.css'
 })
@@ -44,7 +46,7 @@ export class ContentSearchComponent implements OnInit{
     genre: '',
     minRating: undefined,
     page: 0,
-    size: 16,
+    size: 18,
     titleBoost: 3.0,
     plotBoost: 1.5,
     castBoost: 1.0,

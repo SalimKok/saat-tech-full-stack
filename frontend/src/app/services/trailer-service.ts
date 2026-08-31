@@ -41,6 +41,7 @@ export class TrailerService {
     const payload = { name, type };
     return this.http.patch<TrailerDto>(`${this.apiUrl}/${contentId}/trailers/${trailerId}`, payload);
   }
+  
   deleteTrailer(contentId: number, trailerId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${contentId}/trailers/${trailerId}`);
   }

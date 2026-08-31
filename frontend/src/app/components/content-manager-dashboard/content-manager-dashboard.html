@@ -2,14 +2,12 @@
   
   <header class="dashboard-header">
     <div class="header-content">
-      <!-- OK İŞARETİ DAHA BELİRGİN (MAVİ) YAPILDI -->
       <button class="back-btn" routerLink="/movies" style="color: #007bff; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;">
         &#8592; Back to Movie List
       </button>
       <h2>Content Management Panel <span>(ID: {{ contentId }})</span></h2>
     </div>
 
-    <!-- SAĞ KÖŞE: EDIT VE DELETE BUTONLARI -->
     <div class="header-actions" style="display: flex; gap: 12px; margin-top: 15px;">
       <button class="btn btn-outline" (click)="openEditModal()" style="color: #ffc107; border-color: #ffc107;" onmouseover="this.style.background='#ffc107'; this.style.color='#111'" onmouseout="this.style.background='transparent'; this.style.color='#ffc107'">
         <i class="fas fa-edit"></i> Edit Content
@@ -41,7 +39,6 @@
     </app-content-media-manager>
   </main>
 
-  <!-- HAZIR EDİT MODALIMIZ (Ekranda Gizli Bekler, Tıklanınca Açılır) -->
   <app-edit-modal 
     *ngIf="selectedMovie" 
     [movie]="selectedMovie" 

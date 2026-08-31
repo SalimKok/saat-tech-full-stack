@@ -1,6 +1,5 @@
 <div class="general-info-section" *ngIf="contentData">
 
-  <!-- SOL KISIM: Film Afişi (Poster) -->
   <div class="poster-container">
     <img *ngIf="contentData.metadata?.poster" [src]="contentData.metadata.poster" alt="Poster" class="poster-image">
     
@@ -9,10 +8,8 @@
     </div>
   </div>
 
-  <!-- SAĞ KISIM: Detaylar, Oyuncular ve Lisanslar -->
   <div class="details-container">
     
-    <!-- Başlık ve Ufak Rozetler -->
     <div>
       <h2 class="content-title">
         {{ contentData.metadata?.title || 'Unknown Title' }} 
@@ -21,12 +18,10 @@
       <div class="badges-wrapper">
         <span class="badge badge-type">{{ contentData.contentType }}</span>
         
-        <!-- Saat/Süre -->
         <span class="badge badge-neutral">
           <i class="fas fa-clock"></i> {{ contentData.metadata?.runtime || 'N/A' }}
         </span>
         
-        <!-- GARANTİLİ YILDIZ İŞARETİ EKLENDİ VE SARI YAPILDI -->
         <span class="badge badge-neutral">
           <span style="color: #ffc107; font-size: 1.1rem;">&#9733;</span> {{ contentData.metadata?.imdbRating || 'N/A' }}
         </span>
@@ -39,13 +34,11 @@
       </div>
     </div>
 
-    <!-- Konu / Hikaye (Plot) -->
     <div class="section-box">
       <h4 class="section-title"><i class="fas fa-align-left"></i> Overview</h4>
       <p class="plot-text">{{ contentData.metadata?.plot || 'No overview available for this content.' }}</p>
     </div>
 
-    <!-- Ekstra Teknik Detaylar -->
     <div class="section-box metadata-grid">
       <div>
         <p class="metadata-item"><span class="metadata-label">Genre: </span> <span class="metadata-value">{{ contentData.metadata?.genre || '-' }}</span></p>
@@ -58,10 +51,8 @@
       </div>
     </div>
 
-    <!-- Oyuncular ve Lisanslar Yan Yana -->
     <div class="split-grid">
       
-      <!-- Casts (Oyuncular) -->
       <div class="section-box">
         <h4 class="section-title"><i class="fas fa-users"></i> Top Cast</h4>
         <div *ngIf="contentData.casts && contentData.casts.length > 0; else noCast">
@@ -73,7 +64,6 @@
         <ng-template #noCast><p style="color: #888; margin: 0;">No cast information attached.</p></ng-template>
       </div>
 
-      <!-- Licenses (Lisanslar) -->
       <div class="section-box">
         <h4 class="section-title"><i class="fas fa-key"></i> Active Licenses</h4>
         <div *ngIf="contentData.licenses && contentData.licenses.length > 0; else noLicense">

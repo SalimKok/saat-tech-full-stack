@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router'; // Router Eklendi
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ContentMediaManagerComponent } from '../content-media-manager/content-media-manager';
 import { ContentGeneralInfoComponent } from '../content-general-info/content-general-info';
-import { ContentService } from '../../services/contentService'; // Servis Eklendi
-import { EditModal } from '../edit-modal/edit-modal'; // Edit Modalı Eklendi
+import { ContentService } from '../../services/contentService';
+import { EditModal } from '../edit-modal/edit-modal';
 
 @Component({
   selector: 'app-content-manager-dashboard',
@@ -17,13 +17,13 @@ export class ContentManagerDashboard implements OnInit {
   contentId!: number;
   activeTab: string = 'general';
   
-  selectedMovie: any = null; // Edit modalını tetikleyecek değişken
+  selectedMovie: any = null; 
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router, // Silme işleminden sonra ana sayfaya atmak için
+    private router: Router, 
     private cdr: ChangeDetectorRef,
-    private contentService: ContentService // Silme ve Edit için veri çekme
+    private contentService: ContentService 
   ) {}
 
   ngOnInit(): void {
@@ -41,14 +41,13 @@ export class ContentManagerDashboard implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // --- DELETE İŞLEMİ ---
   deleteContent(): void {
     const confirmDelete = confirm('Are you sure you want to permanently delete this content?');
     if (confirmDelete) {
       this.contentService.deleteContent(this.contentId).subscribe({
         next: () => {
           alert('Content successfully deleted.');
-          this.router.navigate(['/movies']); // Başarıyla silinince listeye geri dön
+          this.router.navigate(['/movies']); 
         },
         error: (err) => {
           console.error('Delete error', err);
@@ -58,9 +57,7 @@ export class ContentManagerDashboard implements OnInit {
     }
   }
 
-  // --- EDİT İŞLEMİ ---
   openEditModal(): void {
-    // Önce filmin güncel halini servisten çek, sonra modalı aç (Smart Component mantığı)
     this.contentService.getContentById(this.contentId).subscribe({
       next: (data) => {
         this.selectedMovie = data;
@@ -78,7 +75,6 @@ export class ContentManagerDashboard implements OnInit {
   onMovieSaved(): void {
     this.selectedMovie = null;
     alert('Changes saved successfully!');
-    // Kayıt yapıldıktan sonra ekrandaki güncel bilgileri görebilmek için sayfayı tazele
     window.location.reload(); 
   }
 }

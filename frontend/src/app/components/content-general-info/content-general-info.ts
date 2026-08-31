@@ -10,8 +10,8 @@ import { ContentService } from '../../services/contentService';
   styleUrls: ['./content-general-info.css']
 })
 export class ContentGeneralInfoComponent implements OnInit {
-  @Input() contentId!: number; // Artık dışarıdan sadece ID alıyor
-  contentData: any = null; // Kendi verisini kendi tutuyor
+  @Input() contentId!: number; 
+  contentData: any = null;
 
   constructor(
     private contentService: ContentService,
@@ -24,7 +24,6 @@ export class ContentGeneralInfoComponent implements OnInit {
     }
   }
 
-  // Kendi özel verisini kendi çekiyor!
   fetchContentDetails(): void {
     this.contentService.getContentById(this.contentId).subscribe({
       next: (data) => {

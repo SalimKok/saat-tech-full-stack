@@ -86,49 +86,40 @@
     </div>  
   </div>
   
-  <div class="filters-row">
+  <div class="premium-filter-bar">
     
-    <div class="filter-group">
-      <span class="filter-label">Type:</span>
-      <button 
-        type="button" 
-        *ngFor="let type of contentTypes"
-        class="pill-btn" 
-        [class.active]="filter.contentType === type.value" 
-        (click)="onContentTypeChange(type.value)">
-        {{ type.label }}
-      </button>
-    </div>
-   
-    <div class="filter-group">
-      <span class="filter-label">Genre:</span>
-      <button 
-        type="button"
-        *ngFor="let g of genres" 
-        class="pill-btn" 
-        [class.active]="(g === 'All' && !filter.genre) || filter.genre === g"
-        (click)="onGenreChange(g)">
-        {{ g }}
-      </button>
+    <div class="filter-section">
+      <div class="filter-icon">🎬</div>
+      <div class="filter-options">
+        <button type="button" *ngFor="let type of contentTypes"
+          class="premium-pill" [class.active]="filter.contentType === type.value" 
+          (click)="onContentTypeChange(type.value)">
+          {{ type.label }}
+        </button>
+      </div>
     </div>
     
-    <div class="filter-group" style="display: flex; align-items: center; gap: 12px; background: #141724; border: 1px solid #232738; padding: 6px 16px; border-radius: 30px;">
-      <span class="filter-label" style="margin: 0; font-size: 13px;">
-        Rating: 
-        <strong style="color: #45f3ff; display: inline-block; width: 34px;">
-          {{ filter.minRating ? (filter.minRating | number:'1.1-1') + '+' : 'All' }}
-        </strong>
-      </span>
-      <input 
-        type="range" 
-        min="0" 
-        max="10" 
-        step="0.5" 
-        [value]="filter.minRating || 0" 
-        (change)="onSliderRatingChange($event)" 
-        style="accent-color: #45f3ff; cursor: pointer; width: 140px; margin: 0; height: 6px;" />
+    <div class="filter-divider"></div>
+    <div class="filter-section">
+      <div class="filter-icon">🎭</div>
+      <div class="filter-options">
+        <button type="button" *ngFor="let g of genres" 
+          class="premium-pill" [class.active]="(g === 'All' && !filter.genre) || filter.genre === g"
+          (click)="onGenreChange(g)">
+          {{ g }}
+        </button>
+      </div>
+    </div>
+    <div class="filter-divider"></div>
+    <div class="filter-section rating-section">
+      <div class="filter-icon">⭐</div>
+      <div class="rating-controls">
+        <span class="rating-value">{{ filter.minRating ? (filter.minRating | number:'1.1-1') + '+' : 'Any' }}</span>
+        <input type="range" min="0" max="10" step="0.5" [value]="filter.minRating || 0" (change)="onSliderRatingChange($event)" class="premium-slider" />
+      </div>
     </div>
   </div>
+
 </section>
 
 
@@ -142,11 +133,24 @@
 
 
 <div class="cards-grid" *ngIf="contents.length > 0">
-  <div class="movie-card" *ngFor="let item of contents" (click)="openExplainModal(item)">
+  <div class="movie-card" *ngFor="let item of contents">
+    
     <div class="card-poster">
       <img [src]="item.poster || 'https://via.placeholder.com/300x450?text=No+Poster'" [alt]="item.title" loading="lazy" />
       <div class="card-rating" *ngIf="item.imdbRating">⭐ {{ item.imdbRating }}</div>
       <div class="card-type" [class.series]="item.contentType === 'SERIES'">{{ item.contentType }}</div>
+      
+      <!-- HOVER OVERLAY VE BUTONLAR -->
+      <div class="card-overlay">
+        <!-- Sinema İzleme Sayfasına Gider -->
+        <button type="button" class="overlay-btn btn-watch" [routerLink]="['/watch', item.id]">
+          <span class="icon">▶</span> View Details
+        </button>
+        <!-- Elasticsearch Modalını Açar -->
+        <button type="button" class="overlay-btn btn-explain" (click)="openExplainModal(item)">
+          <span class="icon">🔍</span> Match Insights
+        </button>
+      </div>
     </div>
     
     <div class="card-content">

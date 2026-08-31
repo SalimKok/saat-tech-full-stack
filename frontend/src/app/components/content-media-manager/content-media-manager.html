@@ -5,19 +5,16 @@
     <i class="fas fa-upload"></i> Upload Physical Video (.mp4)
   </button>
 
-  <!-- Local Video.js Player -->
   <div class="mt-3" *ngIf="activeVideoUrl">
     <p class="text-muted">Preview of physical video:</p>
     <app-video-player [src]="activeVideoUrl" type="video/mp4"></app-video-player>
   </div>
 
-  <!-- YouTube (TMDB) Embedded Player -->
   <div class="mt-3" *ngIf="activeYoutubeUrl">
     <p class="text-muted preview-title">YouTube Preview:</p>
     <iframe [src]="activeYoutubeUrl" width="100%" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="iframe-preview"></iframe>
   </div>
 
-  <!-- TMDB EDIT FORM -->
   <div class="mt-4 edit-panel" *ngIf="selectedTmdbVideo">
     <h4 class="edit-panel-title">
       <i class="fas fa-edit"></i> Edit {{ selectedTmdbVideo.site === 'Local' ? 'Local Physical' : 'TMDB' }} Video Before Saving
@@ -48,7 +45,6 @@
   </div>
 </div>
 
-<!-- VERİTABANINDAKİ (KAYITLI) VİDEOLAR -->
 <div class="media-box" style="margin-bottom: 3rem;">
   <h3>Saved Database Media</h3>
   <table class="table media-table">
@@ -90,7 +86,6 @@
   </table>
 </div>
 
-<!-- TMDB ÖNİZLEME ALANI -->
 <div class="tmdb-section">
   <div class="tmdb-header">
     <h3>TMDB Previews</h3>
@@ -111,7 +106,6 @@
   </div>
   <p *ngIf="tmdbPreviews.length === 0" class="text-muted mt-2">Click the fetch button to see available TMDB videos.</p>
   
-  <!-- PAGINATION KONTROLLERİ -->
   <div *ngIf="tmdbPreviews.length > itemsPerPage" class="pagination-container">
     <button class="btn btn-outline btn-sm btn-page" [disabled]="currentPage === 1" (click)="prevPage()">
       <i class="fas fa-chevron-left"></i> Previous

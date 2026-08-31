@@ -101,8 +101,8 @@
 }
 
 .container {
-  max-width: 1560px;
   width: 100%;
-  margin: 0 auto;
-  padding: 30px 24px;
+  padding: 30px 4%; 
+  max-width: none;
 }
+
