@@ -30,28 +30,30 @@
 
   <div class="cast-grid" *ngIf="!loading && casts.length > 0">
     
-    <div class="cast-card glass-panel" *ngFor="let cast of casts" (click)="onCardClick(cast.id)" style="cursor: pointer;">
+    <div class="cast-card glass-panel" *ngFor="let cast of casts">
       
       <div class="card-poster">
         <img [src]="cast.poster" [alt]="cast.name" *ngIf="cast.poster" />
         <div class="no-image" *ngIf="!cast.poster">👤</div>
         
-        <div class="card-overlay">
-          <div class="edit-content">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            <span>Edit</span>
-          </div>
+        <div class="card-overlay" style="display: flex; flex-direction: column; gap: 12px; justify-content: center; align-items: center;">
+          <button (click)="onDetailsClick(cast.id)" style="background: rgba(99, 102, 241, 0.9); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 120px; display: flex; align-items: center; justify-content: center; gap: 8px; backdrop-filter: blur(4px); transition: all 0.2s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            Details
+          </button>
+          
+          <button (click)="onEditClick(cast.id)" style="background: rgba(34, 139, 230, 0.9); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 120px; display: flex; align-items: center; justify-content: center; gap: 8px; backdrop-filter: blur(4px); transition: all 0.2s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </button>
         </div>
       </div>
 
       <div class="card-info">
         <h3>{{ cast.name }}</h3>
       </div>
-      
     </div>
-
-  </div>
-
+  </div> 
 
   <div class="empty-state glass-panel" *ngIf="!loading && casts.length === 0">
     <div class="empty-icon">🎭</div>

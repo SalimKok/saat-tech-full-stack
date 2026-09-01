@@ -12,7 +12,6 @@ export class AuthCallbackComponent implements OnInit {
 
  constructor(private router: Router) {}
   ngOnInit(): void {
-    // URL'de token aramaya veya TokenService ile kaydetmeye gerek kalmadı. Cookie hallediyor.
-    this.router.navigate(['/movies']);
+    this.router.navigate(['/contents']);
   }
 }

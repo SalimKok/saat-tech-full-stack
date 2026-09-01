@@ -1,6 +1,7 @@
 package com.saattech.service.implementation;
 
 import com.saattech.config.properties.StorageProperties;
+import com.saattech.constant.exception.StorageExceptionMessages;
 import com.saattech.service.StorageService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class LocalStorageServiceImpl implements StorageService {
             rootLocation = Paths.get(storageProperties.getUploadDir());
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize storage directory", e);
+            throw new RuntimeException(StorageExceptionMessages.INIT_FAILED, e);
         }
     }
 
@@ -35,12 +36,12 @@ public class LocalStorageServiceImpl implements StorageService {
     public String store(MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                throw new RuntimeException("Failed to store empty file.");
+                throw new RuntimeException(StorageExceptionMessages.EMPTY_FILE);
             }
 
             String contentType = file.getContentType();
             if (contentType == null || (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
-                throw new RuntimeException("Security violation: Only image and video files are allowed.");
+                throw new RuntimeException(StorageExceptionMessages.SECURITY_VIOLATION);
             }
 
             String originalFilename = file.getOriginalFilename();
@@ -51,7 +52,7 @@ public class LocalStorageServiceImpl implements StorageService {
 
             java.util.List<String> allowedExtensions = java.util.Arrays.asList(".jpg", ".jpeg", ".png", ".webp", ".mp4", ".webm");
             if (!allowedExtensions.contains(extension)) {
-                throw new RuntimeException("Unsupported file format. Only JPG, PNG, WEBP, MP4 or WEBM are allowed.");
+                throw new RuntimeException(StorageExceptionMessages.UNSUPPORTED_FORMAT);
             }
 
             String newFilename = UUID.randomUUID().toString() + extension;
@@ -60,7 +61,7 @@ public class LocalStorageServiceImpl implements StorageService {
             return storageProperties.getUrlPrefix() + "/" + newFilename;
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store file.", e);
+            throw new RuntimeException(StorageExceptionMessages.STORE_FAILED, e);
         }
     }
 

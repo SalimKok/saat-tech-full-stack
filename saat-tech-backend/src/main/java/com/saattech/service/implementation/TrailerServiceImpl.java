@@ -1,5 +1,7 @@
 package com.saattech.service.implementation;
 
+import com.saattech.constant.exception.ContentExceptionMessages;
+import com.saattech.constant.exception.TrailerExceptionMessages;
 import com.saattech.dto.tmdb.TmdbSaveRequestDto;
 import com.saattech.dto.trailer.TrailerResponseDto;
 import com.saattech.entity.Content;
@@ -35,7 +37,7 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public List<TrailerResponseDto> getTrailersByContentId(Long contentId) {
         contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + contentId));
+                .orElseThrow(() -> new ResourceNotFoundException(TrailerExceptionMessages.NOT_FOUND_ID + contentId));
 
         List<Trailer> trailers = trailerRepository.findByContentId(contentId);
         return trailerMapper.toDtoList(trailers);
@@ -44,7 +46,7 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public List<TrailerResponseDto> fetchAndSaveTrailers(Long contentId) {
         Content content = contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + contentId));
+                .orElseThrow(() -> new ResourceNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
 
         String imdbId = extractImdbId(content);
 
@@ -61,9 +63,7 @@ public class TrailerServiceImpl implements TrailerService {
 
         if (!newTrailers.isEmpty()) {
             trailerRepository.saveAll(newTrailers);
-            log.info("Saved {} new trailers for content ID: {}", newTrailers.size(), contentId);
         } else {
-            log.info("No new trailers to save for content ID: {} (all already exist)", contentId);
         }
 
         List<Trailer> allTrailers = trailerRepository.findByContentId(contentId);
@@ -74,15 +74,14 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public void deleteTrailersByContentId(Long contentId) {
         contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + contentId));
+                .orElseThrow(() -> new ResourceNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
         trailerRepository.deleteByContentId(contentId);
-        log.info("Deleted all trailers for content ID: {}", contentId);
     }
 
     private String extractImdbId(Content content) {
         if (content.getMetadata() == null || content.getMetadata().getImdbID() == null
                 || content.getMetadata().getImdbID().isBlank()) {
-            throw new IllegalStateException("Content has no IMDB ID in metadata (Content ID: " + content.getId() + ")");
+            throw new IllegalStateException(ContentExceptionMessages.MISSING_IMDB_ID + content.getId() + ")");
         }
         return content.getMetadata().getImdbID().trim();
     }
@@ -92,7 +91,7 @@ public class TrailerServiceImpl implements TrailerService {
     public TrailerResponseDto uploadAndSaveTrailer(Long contentId, MultipartFile file, String name, String type) {
 
         Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new EntityNotFoundException("Content not found with id: " + contentId));
+                .orElseThrow(() -> new EntityNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
 
         String fileUrl = storageService.store(file);
 
@@ -106,7 +105,7 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public List<TrailerResponseDto> previewTmdbTrailers(Long contentId) {
         Content content = contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + contentId));
+                .orElseThrow(() -> new ResourceNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
         String imdbId = extractImdbId(content);
         List<Trailer> fetchedTrailers = tmdbService.fetchTrailersFromTmdb(imdbId, content);
         return trailerMapper.toDtoList(fetchedTrailers);
@@ -116,7 +115,7 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public TrailerResponseDto saveSingleTmdbTrailer(Long contentId, TmdbSaveRequestDto request) {
         Content content = contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + contentId));
+                .orElseThrow(() -> new ResourceNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
 
         Trailer trailer = trailerMapper.toEntity(request, content);
 
@@ -128,9 +127,9 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public TrailerResponseDto updateTrailerDetails(Long contentId, Long trailerId, String newName, String newType) {
         Trailer trailer = trailerRepository.findById(trailerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Trailer not found! ID: " + trailerId));
+                .orElseThrow(() -> new ResourceNotFoundException(TrailerExceptionMessages.NOT_FOUND_ID + trailerId));
         if (!trailer.getContent().getId().equals(contentId)) {
-            throw new IllegalStateException("This trailer does not belong to the specified content!");
+            throw new IllegalStateException(TrailerExceptionMessages.NOT_BELONG_TO_CONTENT);
         }
 
         if (newName != null && !newName.isBlank()) {
@@ -149,23 +148,20 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public void deleteTrailer(Long contentId, Long trailerId) {
         Trailer trailer = trailerRepository.findById(trailerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Trailer not found! ID: " + trailerId));
+                .orElseThrow(() -> new ResourceNotFoundException(TrailerExceptionMessages.NOT_FOUND_ID + trailerId));
 
         if (!trailer.getContent().getId().equals(contentId)) {
-            throw new IllegalStateException("This trailer does not belong to the specified content!");
+            throw new IllegalStateException(TrailerExceptionMessages.NOT_BELONG_TO_CONTENT);
         }
 
         if ("Local".equals(trailer.getSite()) && trailer.getFileUrl() != null && !trailer.getFileUrl().isBlank()) {
             try {
                 storageService.delete(trailer.getFileUrl());
-                log.info("Deleted physical file for trailer: {}", trailer.getFileUrl());
             } catch (Exception e) {
-                log.error("Failed to delete physical file for trailer ID {}. Error: {}", trailerId, e.getMessage());
             }
         }
 
         trailerRepository.delete(trailer);
-        log.info("Deleted trailer DB record ID: {}", trailerId);
     }
 
 }

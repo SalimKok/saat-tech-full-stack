@@ -1,5 +1,6 @@
 package com.saattech.controller;
 
+import com.saattech.dto.cast.CastContentDto;
 import com.saattech.dto.cast.CastRequestDto;
 import com.saattech.dto.cast.CastResponseDto;
 import com.saattech.security.IsAdmin;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,6 +39,11 @@ public class CastController {
     @GetMapping("/{id}")
     public ResponseEntity<CastResponseDto> getCastById(@PathVariable Long id) {
         CastResponseDto response = castService.getCastById(id);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/{id}/contents")
+    public ResponseEntity<List<CastContentDto>> getCastContents(@PathVariable Long id) {
+        List<CastContentDto> response = castService.getCastContents(id);
         return ResponseEntity.ok(response);
     }
 

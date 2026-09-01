@@ -30,12 +30,17 @@ export class CastList implements OnInit {
     this.fetchCasts(0);
   }
 
-  onCardClick(id?: number): void {
+    onEditClick(id?: number): void {
     if (id) {
       this.router.navigate(['/casts/edit', id]);
     }
   }
 
+  onDetailsClick(id?: number): void {
+    if (id) {
+      this.router.navigate(['/casts/details', id]);
+    }
+  }
 
   fetchCasts(page: number): void {
     this.loading = true;
@@ -51,8 +56,8 @@ export class CastList implements OnInit {
         this.cdr.detectChanges(); 
       },
       error: (err) => {
-        console.error("Backend'den veri çekerken hata oluştu:", err);
-        alert("Veriler yüklenemedi. Lütfen konsolu (F12) kontrol edin.");
+        console.error("An error occurred while retrieving data from the backend.:", err);
+        alert("Data could not be loaded. Please check the console.");
         this.loading = false;
         this.cdr.detectChanges(); 
       }

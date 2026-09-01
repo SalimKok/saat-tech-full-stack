@@ -1,0 +1,48 @@
+<div class="detail-container">
+  
+  <div class="header-action">
+    <button class="btn-back" (click)="goBack()">← Back to Casts</button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading" style="text-align: center; padding: 50px;">
+    <h2>Loading profile...</h2>
+  </div>
+
+  <ng-container *ngIf="!loading && cast">
+    
+    <div class="profile-banner">
+      <div class="poster-wrapper">
+        <img *ngIf="cast.poster" [src]="cast.poster" [alt]="cast.name" />
+        <span *ngIf="!cast.poster" style="font-size: 64px;">👤</span>
+      </div>
+      
+      <div class="info-wrapper">
+        <h1>{{ cast.name }}</h1>
+        <div class="stat-badge">
+          Appeared in {{ contents?.length || 0 }} {{ contents?.length === 1 ? 'content' : 'contents' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="filmography-section">
+      <h2>Associated Contents</h2>
+      
+      <div *ngIf="!contents || contents.length === 0" style="color: #94a3b8; font-style: italic;">
+        No contents found for this cast member.
+      </div>
+      
+      <div class="movies-grid" *ngIf="contents && contents.length > 0">
+        
+        <div class="movie-card" *ngFor="let content of contents">
+          <img *ngIf="content.poster" [src]="content.poster" [alt]="content.title" class="movie-poster" />
+          <div *ngIf="!content.poster" class="movie-poster" style="display:flex; align-items:center; justify-content:center; font-size:32px;">🎞️</div>
+          
+          <div class="movie-title" [title]="content.title">{{ content.title || 'Untitled' }}</div>
+          <div class="movie-role">{{ content.role }}</div>
+        </div>
+
+      </div>
+    </div>
+    
+  </ng-container>
+</div>

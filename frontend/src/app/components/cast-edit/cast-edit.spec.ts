@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CastForm } from './cast-form';
+import { CastForm } from './cast-edit';
 
 describe('CastForm', () => {
   let component: CastForm;

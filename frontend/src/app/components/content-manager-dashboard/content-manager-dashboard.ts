@@ -47,7 +47,7 @@ export class ContentManagerDashboard implements OnInit {
       this.contentService.deleteContent(this.contentId).subscribe({
         next: () => {
           alert('Content successfully deleted.');
-          this.router.navigate(['/movies']); 
+          this.router.navigate(['/contents']); 
         },
         error: (err) => {
           console.error('Delete error', err);

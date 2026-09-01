@@ -1,5 +1,6 @@
 package com.saattech.dto.content;
 
+import com.saattech.constant.validation.ContentValidationMessages;
 import com.saattech.dto.contentcast.ContentCastRequestDto;
 import com.saattech.dto.license.LicenseRequestDto;
 import com.saattech.dto.metadata.MetadataRequestDto;
@@ -16,7 +17,7 @@ public class ContentRequestDto {
     private Integer seasonNo;
     private Integer episodeNo;
 
-    @NotNull(message = "Content type cannot be left blank.")
+    @NotNull(message = ContentValidationMessages.TYPE_NOT_NULL)
     private ContentType contentType;
 
     private Long parentId;
@@ -27,7 +28,7 @@ public class ContentRequestDto {
     private List<ContentRequestDto> subContents;
 
     @Valid
-    @NotNull(message = "Metadata cannot be left blank.")
+    @NotNull(message = ContentValidationMessages.METADATA_NOT_NULL)
     private MetadataRequestDto metadata;
 
     @Valid

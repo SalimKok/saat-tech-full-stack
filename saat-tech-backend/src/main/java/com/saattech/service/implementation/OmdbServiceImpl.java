@@ -1,6 +1,7 @@
 package com.saattech.service.implementation;
 
 import com.saattech.config.properties.OmdbProperties;
+import com.saattech.constant.exception.OmdbExceptionMessages;
 import com.saattech.dto.omdb.OmdbResponseDto;
 import com.saattech.dto.cast.CastRequestDto;
 import com.saattech.dto.contentcast.ContentCastRequestDto;
@@ -37,7 +38,7 @@ public class OmdbServiceImpl implements OmdbService {
         OmdbResponseDto responseDto = restTemplate.getForObject(requestUrl, OmdbResponseDto.class);
         ContentRequestDto requestDto = omdbMapper.toContentRequestDto(responseDto);
         if (requestDto == null) {
-            throw new ResourceNotFoundException("Movie not found in OMDB for ID: " + imdbId);
+            throw new ResourceNotFoundException(OmdbExceptionMessages.MOVIE_NOT_FOUND + imdbId);
         }
 
         List<ContentCastRequestDto> casts = new ArrayList<>();
@@ -64,9 +65,7 @@ public class OmdbServiceImpl implements OmdbService {
                     ContentRequestDto requestDto = fetchFromOmdb(cleanId);
                     contentService.saveContent(requestDto);
                     successful.add(cleanId);
-                    log.info("Successfully imported content with IMDb ID: {}", cleanId);
                 } catch (Exception e) {
-                    log.error("Failed to import content with IMDb ID: {} - Reason: {}", cleanId, e.getMessage());
                     failed.add(cleanId + " -> " + e.getMessage());
                 }
             }

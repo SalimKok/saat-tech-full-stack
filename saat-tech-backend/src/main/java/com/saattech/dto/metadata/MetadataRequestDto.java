@@ -1,5 +1,6 @@
 package com.saattech.dto.metadata;
 
+import com.saattech.constant.validation.ContentValidationMessages;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -7,13 +8,13 @@ import java.time.LocalDate;
 
 @Data
 public class MetadataRequestDto {
-    @NotBlank(message = "Content title cannot be left blank.")
+    @NotBlank(message = ContentValidationMessages.TITLE_NOT_BLANK)
     private String title;
 
     private String poster;
     private LocalDate released;
 
-    @PositiveOrZero(message = "IMDB rating must be 0 or greater.")
+    @PositiveOrZero(message = ContentValidationMessages.RATING_POSITIVE_OR_ZERO)
     private Double imdbRating;
 
     private String imdbVotes;

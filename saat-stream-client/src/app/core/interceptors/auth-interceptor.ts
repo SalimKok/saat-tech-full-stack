@@ -17,11 +17,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && isPlatformBrowser(platformId)) {
+      if ((error.status === 401 || error.status === 403) && isPlatformBrowser(platformId)) {
         tokenService.removeToken();
+        alert('Your session has expired. Please log in again.');
         window.location.href = 'http://localhost:4202/login';
       }
       return throwError(() => error);
     })
   );
 };
+

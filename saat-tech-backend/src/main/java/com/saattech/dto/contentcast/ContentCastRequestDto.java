@@ -1,5 +1,6 @@
 package com.saattech.dto.contentcast;
 
+import com.saattech.constant.validation.CastValidationMessages;
 import com.saattech.enums.CastType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -7,10 +8,10 @@ import lombok.Data;
 @Data
 public class ContentCastRequestDto {
 
-    @NotNull(message = "Cast ID field cannot be left blank.")
+    @NotNull(message = CastValidationMessages.ID_NOT_NULL)
     private Long castId;
 
-    @NotNull(message = "Cast role cannot be left blank.")
+    @NotNull(message = CastValidationMessages.ROLE_NOT_NULL)
     private CastType role;
 
     private String castName;

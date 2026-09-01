@@ -8,7 +8,7 @@ export const routes: Routes = [
 
   { path: 'search', component: ContentSearchComponent},
   
-  { path: 'watch/:id', component: ContentDetailComponent},
+  { path: 'details/:id', component: ContentDetailComponent},
 
   { path: '', redirectTo: 'search', pathMatch: 'full' }
 ];

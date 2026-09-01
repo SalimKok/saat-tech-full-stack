@@ -3,15 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CastService } from '../../services/castservice';
+import { CastContentDto } from '../../models/CastContentDto';
 
 @Component({
-  selector: 'app-cast-form',
+  selector: 'app-cast-edit',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './cast-form.html',
-  styleUrl: './cast-form.css'
+  templateUrl: './cast-edit.html',
+  styleUrl: './cast-edit.css'
 })
-export class CastForm implements OnInit {
+export class CastEdit implements OnInit {
   private castService = inject(CastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -30,7 +31,7 @@ export class CastForm implements OnInit {
   isSubmitting: boolean = false;
   isDeleting: boolean = false;
   errorMessage: string = '';
-
+  
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {

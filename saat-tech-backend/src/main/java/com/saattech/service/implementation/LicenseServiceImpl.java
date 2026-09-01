@@ -1,5 +1,7 @@
 package com.saattech.service.implementation;
 
+import com.saattech.constant.exception.ContentExceptionMessages;
+import com.saattech.constant.exception.LicenseExceptionMessages;
 import com.saattech.dto.license.LicenseRequestDto;
 import com.saattech.dto.license.LicenseResponseDto;
 import com.saattech.entity.Content;
@@ -34,7 +36,7 @@ public class LicenseServiceImpl implements LicenseService {
     @Transactional
     public LicenseResponseDto addLicenseToContent(Long contentId, LicenseRequestDto requestDto) {
         Content content = contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
-                .orElseThrow(() -> new ResourceNotFoundException("Content not found! ID: " + contentId));
+                .orElseThrow(() -> new ResourceNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
         License license = licenseMapper.toEntity(requestDto);
         license.setContent(content);
         License savedLicense = licenseRepository.save(license);
@@ -45,7 +47,7 @@ public class LicenseServiceImpl implements LicenseService {
     @Transactional
     public LicenseResponseDto updateLicense(Long licenseId, LicenseRequestDto requestDto) {
         License existingLicense = licenseRepository.findById(licenseId)
-                .orElseThrow(() -> new ResourceNotFoundException("License not found! ID: " + licenseId));
+                .orElseThrow(() -> new ResourceNotFoundException(LicenseExceptionMessages.NOT_FOUND_ID + licenseId));
         if (requestDto.getName() != null) existingLicense.setName(requestDto.getName());
         if (requestDto.getStartDate() != null) existingLicense.setStartDate(requestDto.getStartDate());
         if (requestDto.getEndDate() != null) existingLicense.setEndDate(requestDto.getEndDate());
@@ -58,7 +60,7 @@ public class LicenseServiceImpl implements LicenseService {
     @Transactional
     public LicenseResponseDto detachLicenseFromContent(Long licenseId) {
         License existingLicense = licenseRepository.findById(licenseId)
-                .orElseThrow(() -> new ResourceNotFoundException("License not found! ID: " + licenseId));
+                .orElseThrow(() -> new ResourceNotFoundException(LicenseExceptionMessages.NOT_FOUND_ID + licenseId));
 
         Content affectedContent = existingLicense.getContent();
         existingLicense.setContent(null);
@@ -73,7 +75,7 @@ public class LicenseServiceImpl implements LicenseService {
     @Transactional
     public void deleteLicense(Long licenseId) {
         License existingLicense = licenseRepository.findById(licenseId)
-                .orElseThrow(() -> new ResourceNotFoundException("License not found! ID: " + licenseId));
+                .orElseThrow(() -> new ResourceNotFoundException(LicenseExceptionMessages.NOT_FOUND_ID + licenseId));
 
         existingLicense.setStatus(LicenseStatus.DELETED);
         Content affectedContent = existingLicense.getContent();

@@ -140,13 +140,10 @@
       <div class="card-rating" *ngIf="item.imdbRating">⭐ {{ item.imdbRating }}</div>
       <div class="card-type" [class.series]="item.contentType === 'SERIES'">{{ item.contentType }}</div>
       
-      <!-- HOVER OVERLAY VE BUTONLAR -->
       <div class="card-overlay">
-        <!-- Sinema İzleme Sayfasına Gider -->
-        <button type="button" class="overlay-btn btn-watch" [routerLink]="['/watch', item.id]">
+        <button type="button" class="overlay-btn btn-watch" [routerLink]="['/details', item.id]">
           <span class="icon">▶</span> View Details
         </button>
-        <!-- Elasticsearch Modalını Açar -->
         <button type="button" class="overlay-btn btn-explain" (click)="openExplainModal(item)">
           <span class="icon">🔍</span> Match Insights
         </button>

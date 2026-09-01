@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { CastDto } from '../models/cast';
 import { PageResponse } from './contentService';
 import { environment } from '../../environments/environment';
+import { CastContentDto } from '../models/CastContentDto';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,10 @@ export class CastService {
 
   getCastById(id: number): Observable<CastDto> {
     return this.http.get<CastDto>(`${this.apiUrl}/${id}`);
+  }
+
+   getCastContents(id: number): Observable<CastContentDto[]> {
+    return this.http.get<CastContentDto[]>(`${this.apiUrl}/${id}/contents`);
   }
 
   uploadPoster(file: File): Observable<{ url: string }> {

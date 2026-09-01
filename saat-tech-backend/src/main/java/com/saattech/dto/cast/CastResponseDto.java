@@ -8,4 +8,5 @@ public class CastResponseDto {
     private Long id;
     private String name;
     private String poster;
+
 }

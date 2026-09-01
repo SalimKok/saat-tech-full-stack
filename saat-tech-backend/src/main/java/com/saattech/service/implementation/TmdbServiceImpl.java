@@ -1,6 +1,7 @@
 package com.saattech.service.implementation;
 
 import com.saattech.config.properties.TmdbProperties;
+import com.saattech.constant.exception.TmdbExceptionMessages;
 import com.saattech.dto.tmdb.TmdbFindResponseDto;
 import com.saattech.dto.tmdb.TmdbVideoResponseDto;
 import com.saattech.entity.Content;
@@ -35,7 +36,7 @@ public class TmdbServiceImpl implements TmdbService {
         TmdbFindResponseDto response = restTemplate.getForObject(findUrl, TmdbFindResponseDto.class);
 
         if (response == null) {
-            throw new ResourceNotFoundException("TMDB find response is null for IMDB ID: " + imdbId);
+            throw new ResourceNotFoundException(TmdbExceptionMessages.RESPONSE_NULL + imdbId);
         }
 
         if (response.getMovieResults() != null && !response.getMovieResults().isEmpty()) {
@@ -46,7 +47,7 @@ public class TmdbServiceImpl implements TmdbService {
             return response.getTvResults().get(0).getId();
         }
 
-        throw new ResourceNotFoundException("No TMDB entry found for IMDB ID: " + imdbId);
+        throw new ResourceNotFoundException(TmdbExceptionMessages.ENTRY_NOT_FOUND + imdbId);
     }
 
     @Override
@@ -61,7 +62,6 @@ public class TmdbServiceImpl implements TmdbService {
         TmdbVideoResponseDto response = restTemplate.getForObject(videosUrl, TmdbVideoResponseDto.class);
 
         if (response == null || response.getResults() == null || response.getResults().isEmpty()) {
-            log.warn("No videos found on TMDB for IMDB ID: {} (TMDB ID: {})", imdbId, tmdbId);
             return Collections.emptyList();
         }
 
@@ -77,7 +77,6 @@ public class TmdbServiceImpl implements TmdbService {
             }
         }
 
-        log.info("Fetched {} YouTube trailers from TMDB for IMDB ID: {}", trailers.size(), imdbId);
         return trailers;
     }
 
