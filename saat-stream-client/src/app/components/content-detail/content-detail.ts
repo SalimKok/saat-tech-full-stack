@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ContentDetailService } from '../../services/content-detail-service';
 import { VideoPlayerComponent } from '../video-player/video-player';
 
@@ -16,7 +15,6 @@ export class ContentDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private contentService = inject(ContentDetailService);
   private location = inject(Location);
-  private sanitizer = inject(DomSanitizer);
   private cdr = inject(ChangeDetectorRef);
 
   content: any;
@@ -30,8 +28,9 @@ export class ContentDetailComponent implements OnInit {
 
   activeTrailer: any = null;
   activeThumbnailUrl: string | null = null;
-  safeTrailerUrl: SafeResourceUrl | null = null;
   isVideoPlaying: boolean = false;
+
+  activeTrailerUrl: string = '';
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -74,17 +73,15 @@ export class ContentDetailComponent implements OnInit {
   setTrailer(trailer: any): void {
     this.activeTrailer = trailer;
     this.isVideoPlaying = false; 
-
     if (trailer.site === 'YouTube') {
       const videoId = trailer.youtubeKey || this.extractYoutubeId(trailer.url || trailer.youtubeEmbedUrl);
       if (videoId) {
         this.activeThumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-        this.safeTrailerUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+        this.activeTrailerUrl = `https://www.youtube.com/watch?v=${videoId}`;
       }
     } else if (trailer.site === 'Local') {
       this.activeThumbnailUrl = this.content?.metadata?.poster || null; 
-      this.safeTrailerUrl = null; 
+      this.activeTrailerUrl = 'http://localhost:8080' + trailer.fileUrl; 
     }
     
     this.cdr.markForCheck(); 

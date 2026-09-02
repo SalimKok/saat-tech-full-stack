@@ -50,11 +50,7 @@
 
         <div class="hero-player">
           <div class="player-container" *ngIf="isVideoPlaying; else coverPhoto">
-        
-            <iframe *ngIf="activeTrailer?.site !== 'Local' && safeTrailerUrl" [src]="safeTrailerUrl" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-            
-           <app-video-player *ngIf="activeTrailer?.site === 'Local'" [src]="'http://localhost:8080' + activeTrailer.fileUrl" type="video/mp4" style="width:100%; height:100%; display:block;"></app-video-player>
-
+            <app-video-player *ngIf="activeTrailerUrl" [src]="activeTrailerUrl" style="width:100%; height:100%; display:block;"></app-video-player>
           </div>
           
           <ng-template #coverPhoto>

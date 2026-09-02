@@ -20,5 +20,5 @@ public interface CastService {
 
     CastResponseDto updateCast(Long id, CastRequestDto requestDto);
 
-    List<CastContentDto> getCastContents(Long id);
+    Page<CastContentDto> getCastContents(Long id, Pageable pageable);
 }

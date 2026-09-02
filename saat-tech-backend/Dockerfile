@@ -14,7 +14,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 RUN addgroup -S spring && adduser -S spring -G spring
+RUN mkdir -p /app/uploads && chown -R spring:spring /app
 USER spring:spring
-
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

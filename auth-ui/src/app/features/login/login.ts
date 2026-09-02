@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth-service';
+import { environment } from '../../../environments/environment.development';
 
 @Component({
   selector: 'app-login',
@@ -29,9 +30,9 @@ export class LoginComponent {
           const role = response.role;
 
           if (role === 'ADMIN') {
-            window.location.href = `http://localhost:4200/auth-callback`;
+            window.location.href = `${environment.apiUrl}/auth-callback`;
           } else {
-            window.location.href = `http://localhost:4201/auth-callback`;
+            window.location.href = `${environment.streamClientUrl}/auth-callback`;
           }
         }
       },

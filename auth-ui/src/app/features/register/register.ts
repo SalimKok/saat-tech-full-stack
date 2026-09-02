@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth-service';
+import { environment } from '../../../environments/environment.development';
 
 @Component({
   selector: 'app-register',
@@ -26,12 +27,20 @@ export class RegisterComponent {
     this.successMessage = '';
 
     this.authService.register(this.userData).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading = false;
-        this.successMessage = 'Registration successful! Redirecting to login...';
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
+        
+        if (response && response.role) {
+          this.successMessage = 'Registration successful! Redirecting to application...';
+          setTimeout(() => {
+            window.location.href = `${environment.apiUrl}/auth-callback`;
+          }, 1500);
+        } else {
+          this.successMessage = 'Registration successful! Redirecting to login...';
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1500);
+        }
       },
       error: (err) => {
         this.isLoading = false;

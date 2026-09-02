@@ -19,7 +19,8 @@
     "@angular/router": "^21.2.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "video.js": "^8.24.0"
+    "video.js": "^8.24.0",
+    "videojs-youtube": "^3.0.1"
   },
   "devDependencies": {
     "@angular/build": "^21.2.19",

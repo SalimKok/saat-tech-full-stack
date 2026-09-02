@@ -3,6 +3,7 @@ import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { catchError, throwError } from 'rxjs';
 import { TokenService } from '../../services/token-service';
+import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const platformId = inject(PLATFORM_ID);
@@ -25,7 +26,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         
         alert('Your session has expired. Please log in again.');
         
-        window.location.href = 'http://localhost:4202/login';
+        window.location.href = environment.loginUrl;
       }
       return throwError(() => error);
     })

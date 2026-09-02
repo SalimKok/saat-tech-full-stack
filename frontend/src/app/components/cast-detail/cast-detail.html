@@ -33,15 +33,37 @@
       
       <div class="movies-grid" *ngIf="contents && contents.length > 0">
         
-        <div class="movie-card" *ngFor="let content of contents">
-          <img *ngIf="content.poster" [src]="content.poster" [alt]="content.title" class="movie-poster" />
-          <div *ngIf="!content.poster" class="movie-poster" style="display:flex; align-items:center; justify-content:center; font-size:32px;">🎞️</div>
+                <div class="movie-card" *ngFor="let content of contents">
+          
+          <div class="movie-poster-wrapper">
+            <img *ngIf="content.poster" [src]="content.poster" [alt]="content.title" class="movie-poster" />
+            <div *ngIf="!content.poster" class="movie-poster" style="display:flex; align-items:center; justify-content:center; font-size:32px;">🎞️</div>
+            
+            <div class="movie-overlay">
+              <a class="btn-detail" [routerLink]="['/content', content.contentId]">Details</a>
+            </div>
+          </div>
           
           <div class="movie-title" [title]="content.title">{{ content.title || 'Untitled' }}</div>
           <div class="movie-role">{{ content.role }}</div>
         </div>
 
       </div>
+
+      <div class="pagination-controls" *ngIf="totalPages > 1">
+        <button 
+          [disabled]="currentPage === 0" 
+          (click)="loadContentsPage(currentPage - 1)">
+          Previous
+        </button>
+        <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+        <button 
+          [disabled]="currentPage >= totalPages - 1" 
+          (click)="loadContentsPage(currentPage + 1)">
+          Next
+        </button>
+      </div>
+
     </div>
     
   </ng-container>

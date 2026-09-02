@@ -21,7 +21,7 @@ export interface PageResponse<T> {
 
 export class ContentService {
   private http = inject(HttpClient);
-  private apiUrl = environment.url+'/contents';
+  private apiUrl = `${environment.apiUrl}/api/contents`;
 
 
   getAllContents(page = 0, size = 20, filter?: ContentFilterDto): Observable<PageResponse<ContentDto>> {

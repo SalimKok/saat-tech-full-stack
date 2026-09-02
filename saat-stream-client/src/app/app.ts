@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ContentSearchService } from './services/content-search-service';
 import { RouterOutlet } from "@angular/router";
 import { TokenService } from './core/services/token-service'; 
+import { HttpClient } from '@angular/common/http'; 
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +15,10 @@ import { TokenService } from './core/services/token-service';
 })
 export class App {
   private readonly searchService = inject(ContentSearchService);
-  isSyncing = false;
   private tokenService = inject(TokenService);
+  private http = inject(HttpClient); 
+  
+  isSyncing = false;
 
   syncIndex(): void {
     if (this.isSyncing) {
@@ -36,9 +40,18 @@ export class App {
     });
   }
 
-    logout() {
-    this.tokenService.removeToken();
-    window.location.href = 'http://localhost:4202/login';
+  logout() {
+    this.http.post(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true })
+      .subscribe({
+        next: () => {
+          this.tokenService.removeToken(); 
+          window.location.href = environment.loginUrl;;
+        },
+        error: (err) => {
+          console.error('Logout failed on backend:', err);
+          this.tokenService.removeToken(); 
+          window.location.href = environment.loginUrl;;
+        }
+      });
   }
 }
-

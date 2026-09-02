@@ -1,5 +1,7 @@
 package com.saattech.apigateway;
 
+import com.saattech.apigateway.config.CorsProperties;
+import com.saattech.apigateway.config.GatewayProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,20 +21,20 @@ import static org.springframework.cloud.gateway.server.mvc.handler.HandlerFuncti
 @SpringBootApplication
 public class ApiGatewayApplication {
 
-	@Value("${GATEWAY_SECRET}")
-	private String gatewaySecret;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApiGatewayApplication.class, args);
 	}
 
 	@Bean
-	public CorsFilter corsFilter() {
+	public CorsFilter corsFilter(CorsProperties corsProperties) {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.addAllowedOrigin("http://localhost:4200");
-		config.addAllowedOrigin("http://localhost:4201");
-		config.addAllowedOrigin("http://localhost:4202");
+
+		if (corsProperties.getAllowedOrigins() != null) {
+			corsProperties.getAllowedOrigins().forEach(config::addAllowedOrigin);
+		}
+
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -41,7 +43,10 @@ public class ApiGatewayApplication {
 	}
 
 	@Bean
-	public RouterFunction<ServerResponse> gatewayRoutes() {
+	public RouterFunction<ServerResponse> gatewayRoutes(GatewayProperties gatewayProperties) {
+
+		String gatewaySecret = gatewayProperties.getSecret();
+
 		return GatewayRouterFunctions.route("core-service")
 				.route(GatewayRequestPredicates.path("/api/contents/**", "/api/casts/**", "/api/licenses/**", "/api/contentSearch/**", "/uploads/**", "/api/contents-trailer/**", "/api/client/contents/**"), http())
 				.filter(lb("core-service"))

@@ -7,6 +7,7 @@ import com.saattech.dto.trailer.TrailerResponseDto;
 import com.saattech.entity.Content;
 import com.saattech.entity.Trailer;
 import com.saattech.enums.ContentStatus;
+import com.saattech.exception.DuplicateResourceException;
 import com.saattech.exception.ResourceNotFoundException;
 import com.saattech.mapper.TrailerMapper;
 import com.saattech.repository.ContentRepository;
@@ -93,6 +94,10 @@ public class TrailerServiceImpl implements TrailerService {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new EntityNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
 
+        if (trailerRepository.existsByContentIdAndName(contentId, name)) {
+            throw new DuplicateResourceException(TrailerExceptionMessages.ALREADY_EXISTS);
+        }
+
         String fileUrl = storageService.store(file);
 
         Trailer trailer = trailerMapper.toEntityForLocalUpload(content, name, type, fileUrl, file.getSize());
@@ -116,6 +121,10 @@ public class TrailerServiceImpl implements TrailerService {
     public TrailerResponseDto saveSingleTmdbTrailer(Long contentId, TmdbSaveRequestDto request) {
         Content content = contentRepository.findByIdAndStatusNot(contentId, ContentStatus.DELETED)
                 .orElseThrow(() -> new ResourceNotFoundException(ContentExceptionMessages.NOT_FOUND_ID + contentId));
+
+        if (trailerRepository.existsByContentIdAndYoutubeKey(contentId, request.getYoutubeKey())) {
+            throw new DuplicateResourceException(TrailerExceptionMessages.ALREADY_EXISTS);
+        }
 
         Trailer trailer = trailerMapper.toEntity(request, content);
 

@@ -10,7 +10,7 @@ import { TrailerDto } from '../models/trailer';
 
 export class TrailerService {
   private http = inject(HttpClient);
-  private apiUrl = environment.url + '/contents-trailer';
+  private apiUrl = `${environment.apiUrl}/api/contents-trailer`;
 
   fetchTrailers(contentId: number): Observable<TrailerDto[]> {
     return this.http.post<TrailerDto[]>(`${this.apiUrl}/${contentId}/trailers/fetch`, {});

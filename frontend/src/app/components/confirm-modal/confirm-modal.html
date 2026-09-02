@@ -1,0 +1,11 @@
+<div class="modal-backdrop" *ngIf="state">
+  <div class="modal-card">
+    <h3 class="modal-title">{{ state.title }}</h3>
+    <p class="modal-message">{{ state.message }}</p>
+    
+    <div class="modal-footer">
+      <button class="btn btn-cancel" (click)="onCancel()">Cancel</button>
+      <button class="btn btn-confirm" (click)="onConfirm()">Confirm</button>
+    </div>
+  </div>
+</div>

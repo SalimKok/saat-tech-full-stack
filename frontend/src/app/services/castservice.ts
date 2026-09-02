@@ -11,7 +11,7 @@ import { CastContentDto } from '../models/CastContentDto';
 })
 export class CastService {
   private http = inject(HttpClient);
-  private apiUrl = environment.url + '/casts';
+  private apiUrl = `${environment.apiUrl}/api/casts`;
 
   getAllCasts(page = 0, size = 15, name?: string): Observable<PageResponse<CastDto>> {
     let params = new HttpParams()
@@ -29,9 +29,14 @@ export class CastService {
     return this.http.get<CastDto>(`${this.apiUrl}/${id}`);
   }
 
-   getCastContents(id: number): Observable<CastContentDto[]> {
-    return this.http.get<CastContentDto[]>(`${this.apiUrl}/${id}/contents`);
+  getCastContents(id: number, page = 0, size = 10): Observable<PageResponse<CastContentDto>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+      
+    return this.http.get<PageResponse<CastContentDto>>(`${this.apiUrl}/${id}/contents`, { params });
   }
+
 
   uploadPoster(file: File): Observable<{ url: string }> {
     const formData = new FormData();

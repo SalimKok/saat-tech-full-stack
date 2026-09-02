@@ -42,8 +42,8 @@ public class CastController {
         return ResponseEntity.ok(response);
     }
     @GetMapping("/{id}/contents")
-    public ResponseEntity<List<CastContentDto>> getCastContents(@PathVariable Long id) {
-        List<CastContentDto> response = castService.getCastContents(id);
+    public ResponseEntity<Page<CastContentDto>> getCastContents(@PathVariable Long id, Pageable pageable) {
+        Page<CastContentDto> response = castService.getCastContents(id, pageable);
         return ResponseEntity.ok(response);
     }
 
