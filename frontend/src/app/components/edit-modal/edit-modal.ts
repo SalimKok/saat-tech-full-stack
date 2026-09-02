@@ -6,6 +6,7 @@ import { ContentService } from '../../services/contentService';
 import { ContentDto } from '../../models/content';
 import { ContentCastEditor } from '../content-cast-editor/content-cast-editor';
 import { LicenseEditor } from '../license-editor/license-editor';
+import { AlertService } from '../../services/alert-service';
 
 
 @Component({
@@ -19,6 +20,10 @@ export class EditModal implements OnChanges, OnDestroy {
   private contentService = inject(ContentService);
   private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
+
+  constructor(
+      private alertService: AlertService
+    ) {}
 
   @Input() movie: ContentDto | null = null;
   @Output() closed = new EventEmitter<void>();
@@ -60,10 +65,10 @@ export class EditModal implements OnChanges, OnDestroy {
 
   onStatusChange(newStatus: string): void {
     if (!this.editingMovie || !this.editingMovie.id) return;
-    if (this.editingMovie.status === newStatus) return; // Zaten aynıysa hiçbir şey yapma
+    if (this.editingMovie.status === newStatus) return;
     
     this.editLoading = true;
-    const previousStatus = this.editingMovie.status; // Hata olursa geri dönmek için eski değeri saklıyoruz
+    const previousStatus = this.editingMovie.status; 
     
     this.contentService.changeContentStatus(this.editingMovie.id, newStatus)
       .pipe(takeUntil(this.destroy$))
@@ -74,9 +79,8 @@ export class EditModal implements OnChanges, OnDestroy {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          alert(err.error?.message || 'Durum değiştirilemedi! Aktif lisans olduğundan emin olun.');
-          
-          // Hata verirse (örn: Lisans yokken Publish seçerse) dropdown'ı eski değerine anında geri çevir
+          this.alertService.showError(err.error?.message || 'The status hasnt changed! Make sure you have an active license.');
+
           this.editingMovie!.status = undefined as any;
           this.cdr.detectChanges();
           this.editingMovie!.status = previousStatus;
@@ -127,7 +131,7 @@ export class EditModal implements OnChanges, OnDestroy {
           this.saved.emit();
         },
         error: (err) => {
-          this.editErrorMessage = err.error?.message || 'Failed to update movie!';
+          this.alertService.showError(err.error?.message || 'Failed to update movie!');
           this.editLoading = false;
           this.cdr.detectChanges();
         }

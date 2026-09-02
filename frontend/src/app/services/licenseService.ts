@@ -2,13 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LicenseDto } from '../models/license';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LicenseService {
   private http = inject(HttpClient);
-  private apiUrl = '/api/licenses';
+  private apiUrl = `${environment.apiUrl}/api/licenses`;
 
   addLicenseToContent(contentId: number, data: LicenseDto): Observable<LicenseDto> {
     return this.http.post<LicenseDto>(`${this.apiUrl}/content/${contentId}`, data);

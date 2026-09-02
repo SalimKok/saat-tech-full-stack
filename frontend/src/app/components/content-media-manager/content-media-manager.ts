@@ -1,9 +1,10 @@
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrailerService } from '../../services/trailer-service';
 import { TrailerDto } from '../../models/trailer'; 
 import { VideoPlayerComponent } from '../video-player/video-player';
+import { AlertService } from '../../services/alert-service';
+import { ConfirmService } from '../../services/confirm-service'; 
 
 @Component({
   selector: 'app-content-media-manager',
@@ -16,7 +17,6 @@ export class ContentMediaManagerComponent implements OnInit {
   @Input() contentId!: number;
 
   activeVideoUrl: string = '';
-  activeYoutubeUrl: SafeResourceUrl | null = null;
   
   savedTrailers: TrailerDto[] = [];
   tmdbPreviews: TrailerDto[] = [];
@@ -30,8 +30,9 @@ export class ContentMediaManagerComponent implements OnInit {
 
   constructor(
     private trailerService: TrailerService,
-    private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private alertService: AlertService,
+    private confirmService: ConfirmService 
   ) {}
 
   ngOnInit(): void {
@@ -82,21 +83,20 @@ export class ContentMediaManagerComponent implements OnInit {
     });
   }
 
-  playSavedVideo(trailer: any): void {
+    playSavedVideo(trailer: any): void {
     this.selectedTmdbVideo = null;
     this.pendingLocalFile = null;
-    this.activeVideoUrl = '';
-    this.activeYoutubeUrl = null;
+    this.activeVideoUrl = ''; 
     
-    if (trailer.site === 'Local' && trailer.fileUrl) {
-      setTimeout(() => {
+    setTimeout(() => {
+      if (trailer.site === 'Local' && trailer.fileUrl) {
         this.activeVideoUrl = trailer.fileUrl;
-        this.cdr.detectChanges();
-      }, 50);
-    } else if (trailer.youtubeEmbedUrl) {
-      this.activeYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(trailer.youtubeEmbedUrl);
+      } else if (trailer.youtubeEmbedUrl) {
+        this.activeVideoUrl = trailer.youtubeEmbedUrl; 
+      }
       this.cdr.detectChanges();
-    }
+    }, 50);
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -105,16 +105,15 @@ export class ContentMediaManagerComponent implements OnInit {
     this.activeVideoUrl = '';
     this.selectedTmdbVideo = { ...trailer };
     
-    if (trailer.site === 'Local' && trailer.fileUrl) {
-      this.activeYoutubeUrl = null;
-      setTimeout(() => {
+    setTimeout(() => {
+      if (trailer.site === 'Local' && trailer.fileUrl) {
         this.activeVideoUrl = trailer.fileUrl;
-        this.cdr.detectChanges();
-      }, 50);
-    } else if (trailer.youtubeEmbedUrl) {
-      this.activeYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(trailer.youtubeEmbedUrl);
-    }
-    this.cdr.detectChanges();
+      } else if (trailer.youtubeEmbedUrl) {
+        this.activeVideoUrl = trailer.youtubeEmbedUrl;
+      }
+      this.cdr.detectChanges();
+    }, 50);
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -122,17 +121,20 @@ export class ContentMediaManagerComponent implements OnInit {
     this.pendingLocalFile = null;
     this.activeVideoUrl = ''; 
     this.selectedTmdbVideo = { ...trailer }; 
-    if (trailer.youtubeEmbedUrl) {
-      this.activeYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(trailer.youtubeEmbedUrl);
-    }
-    this.cdr.detectChanges();
+    
+    setTimeout(() => {
+      if (trailer.youtubeEmbedUrl) {
+        this.activeVideoUrl = trailer.youtubeEmbedUrl;
+      }
+      this.cdr.detectChanges();
+    }, 50);
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.activeYoutubeUrl = null;
       this.activeVideoUrl = '';
       this.pendingLocalFile = file;
       const localUrl = URL.createObjectURL(file);
@@ -146,6 +148,14 @@ export class ContentMediaManagerComponent implements OnInit {
     }
   }
 
+  cancelEdit(): void {
+    this.selectedTmdbVideo = null;
+    this.pendingLocalFile = null;
+    this.activeVideoUrl = '';
+    this.cdr.detectChanges();
+  }
+
+
   updateSelectedName(event: any): void {
     if (this.selectedTmdbVideo) this.selectedTmdbVideo.name = event.target.value;
   }
@@ -154,43 +164,38 @@ export class ContentMediaManagerComponent implements OnInit {
     if (this.selectedTmdbVideo) this.selectedTmdbVideo.type = event.target.value;
   }
 
-  cancelEdit(): void {
-    this.selectedTmdbVideo = null;
-    this.pendingLocalFile = null;
-    this.activeVideoUrl = '';
-    this.activeYoutubeUrl = null;
-    this.cdr.detectChanges();
-  }
-
   confirmAndSaveTmdbVideo(): void {
     if (!this.selectedTmdbVideo) return;
-
     if (this.pendingLocalFile) {
       this.trailerService.uploadTrailer(this.contentId, this.pendingLocalFile, this.selectedTmdbVideo.name, this.selectedTmdbVideo.type).subscribe({
         next: () => {
-          alert('Success! Local physical video has been saved.');
+          this.alertService.showSuccess('Local physical video has been saved.');
           this.fetchSavedTrailers();
           this.cancelEdit();
         },
-        error: (err) => console.error('Upload error:', err)
+        error: (err) => {
+          console.error('Upload error:', err);
+          this.alertService.showError(err.error?.message || 'Failed to upload video.');
+        }
       });
       return;
     }
-
     if (this.selectedTmdbVideo.id) {
       this.trailerService.updateTrailerDetails(
         this.contentId, this.selectedTmdbVideo.id, this.selectedTmdbVideo.name, this.selectedTmdbVideo.type
       ).subscribe({
         next: () => {
-          alert('Success! Video details updated.');
+          this.alertService.showSuccess('Video details updated.');
           this.fetchSavedTrailers();
           this.cancelEdit();
         },
-        error: (err) => console.error('Update error:', err)
+        error: (err) => {
+          console.error('Update error:', err);
+          this.alertService.showError(err.error?.message || 'Failed to update video details.');
+        }
       });
       return;
     }
-
     const payload = {
       name: this.selectedTmdbVideo.name,
       youtubeKey: this.selectedTmdbVideo.youtubeKey,
@@ -202,27 +207,37 @@ export class ContentMediaManagerComponent implements OnInit {
     
     this.trailerService.saveTmdbTrailer(this.contentId, payload).subscribe({
       next: () => {
-        alert('Success! The TMDB Video has been saved.');
+        this.alertService.showSuccess('Success! The TMDB Video has been saved.');
         this.fetchSavedTrailers();
         this.tmdbPreviews = this.tmdbPreviews.filter(t => t.youtubeKey !== payload.youtubeKey);
         this.cancelEdit();
       },
-      error: (err) => console.error('Error saving TMDB video', err)
+      error: (err) => {
+        console.error('Error saving TMDB video', err);
+        this.alertService.showError(err.error?.message || 'Failed to save TMDB video.');
+      }
     });
   }
 
-  deleteSavedVideo(trailer: any): void {
-    const confirmDelete = confirm(`Are you sure you want to completely delete "${trailer.name}"?`);
-    if (confirmDelete) {
+  async deleteSavedVideo(trailer: any): Promise<void> {
+   const confirmed = await this.confirmService.ask(
+      'Delete Video', 
+      `Are you sure you want to completely delete "${trailer.name}"? This action cannot be undone.`
+    );
+
+    if (confirmed) {
       this.trailerService.deleteTrailer(this.contentId, trailer.id).subscribe({
         next: () => {
-          alert('Video successfully deleted.');
+          this.alertService.showSuccess('Video successfully deleted.');
           this.fetchSavedTrailers();
           if (this.selectedTmdbVideo && this.selectedTmdbVideo.id === trailer.id) {
             this.cancelEdit();
           }
         },
-        error: (err) => console.error('Delete error', err)
+        error: (err) => {
+          console.error('Delete error', err);
+          this.alertService.showError('Failed to delete video.');
+        }
       });
     }
   }

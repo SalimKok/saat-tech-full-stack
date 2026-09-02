@@ -17,7 +17,7 @@ export interface BulkImportResponse {
 })
 export class OmdbService {
   private http = inject(HttpClient);
-  private apiUrl = environment.url;
+  private apiUrl = `${environment.apiUrl}`;
 
   previewContent(imdbId: string): Observable<ContentDto> {
     return this.http.get<ContentDto>(`${this.apiUrl}/omdb/preview?imdbId=${imdbId}`);

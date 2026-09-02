@@ -3,6 +3,7 @@ package com.saattech.controller;
 import com.saattech.elasticsearch.model.ContentIndex;
 import com.saattech.elasticsearch.service.ContentSearchService;
 import com.saattech.security.IsAdmin;
+import com.saattech.security.IsAuthenticated;
 import com.saattech.specification.dto.ContentFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/contentSearch")
 @RequiredArgsConstructor
+@IsAuthenticated
 public class ContentSearchController {
 
     private final ContentSearchService contentSearchService;

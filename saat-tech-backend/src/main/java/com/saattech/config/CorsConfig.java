@@ -16,31 +16,6 @@ public class CorsConfig implements WebMvcConfigurer {
 
     private final StorageProperties storageProperties;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins(
-                        "http://localhost:4200",
-                        "http://localhost:4201",
-                        "http://localhost:4202",
-                        "http://localhost:8080"
-                )
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-
-        registry.addMapping(storageProperties.getUrlPrefix() + "/**")
-                .allowedOrigins(
-                        "http://localhost:4200",
-                        "http://localhost:4201",
-                        "http://localhost:4202",
-                        "http://localhost:8080"
-                )
-                .allowedMethods("GET", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
-
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

@@ -14,4 +14,6 @@ public interface TrailerRepository extends JpaRepository<Trailer, Long> {
     void deleteByContentId(Long contentId);
 
     boolean existsByContentIdAndYoutubeKey(Long contentId, String youtubeKey);
+
+    boolean existsByContentIdAndName(Long contentId, String name);
 }

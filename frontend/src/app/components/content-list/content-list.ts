@@ -7,6 +7,8 @@ import { ContentFilterDto } from '../../models/content-filter';
 import { ContentFilter } from '../content-filter/content-filter';
 import { EditModal } from '../edit-modal/edit-modal';
 import { RouterModule } from '@angular/router';
+import { AlertService } from '../../services/alert-service';
+import { ConfirmService } from '../../services/confirm-service'; 
 
 @Component({
   selector: 'app-content-list',
@@ -43,6 +45,11 @@ export class ContentList implements OnInit {
 
   isFilterOpen: boolean = false;
 
+  constructor(
+      private alertService: AlertService,
+      private confirmService: ConfirmService 
+    ) {}
+
   toggleFilter(): void {
     this.isFilterOpen = !this.isFilterOpen;
   }
@@ -68,7 +75,7 @@ export class ContentList implements OnInit {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          this.errorMessage = err.error?.message ?? 'Failed to load movies from server!';
+          this.alertService.showError(err.error?.message ?? 'Failed to load movies from server!');
           this.loading = false;
           this.cdr.markForCheck();
         }
@@ -93,21 +100,28 @@ export class ContentList implements OnInit {
     }
   }
 
-  onDelete(id: number | undefined): void {
+  async onDelete(id: number | undefined): Promise<void> {
     if (!id) return;
-    if (!confirm('Are you sure you want to delete this content?')) return;
+    const confirmed = await this.confirmService.ask(
+      'Delete Content', 
+      'Are you sure you want to permanently delete this content? This action cannot be undone.'
+    );
+
+    if (!confirmed) return;
 
     this.contentService.deleteContent(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
          next: () => {
+          this.alertService.showSuccess('Content successfully deleted!');
+
           if (this.movies.length === 1 && this.currentPage > 0) {
             this.currentPage--;
           }
           this.fetchMovies(this.currentPage);
         },
         error: (err) => {
-          alert('Failed to delete content!');
+          this.alertService.showError('Failed to delete content!');
           console.error(err);
         }
       });

@@ -56,13 +56,13 @@ public class CastServiceImpl implements CastService {
         return castMapper.toDto(cast);
     }
     @Override
-    public List<CastContentDto> getCastContents(Long id) {
+    public Page<CastContentDto> getCastContents(Long id, Pageable pageable) {
         castRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(CastExceptionMessages.NOT_FOUND_ID + id));
 
-        List<ContentCast> contentCasts = contentCastRepository.findByCastIdWithContent(id);
+        Page<ContentCast> contentCasts = contentCastRepository.findByCastIdWithContent(id, pageable);
 
-        return contentCasts.stream().map(cc -> {
+        return contentCasts.map(cc -> {
             CastContentDto cDto = new CastContentDto();
             cDto.setContentId(cc.getContent().getId());
 
@@ -73,7 +73,7 @@ public class CastServiceImpl implements CastService {
 
             cDto.setRole(cc.getRole());
             return cDto;
-        }).toList();
+        });
     }
 
     @Override

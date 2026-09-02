@@ -5,14 +5,9 @@
     <i class="fas fa-upload"></i> Upload Physical Video (.mp4)
   </button>
 
-  <div class="mt-3" *ngIf="activeVideoUrl">
-    <p class="text-muted">Preview of physical video:</p>
-    <app-video-player [src]="activeVideoUrl" type="video/mp4"></app-video-player>
-  </div>
-
-  <div class="mt-3" *ngIf="activeYoutubeUrl">
-    <p class="text-muted preview-title">YouTube Preview:</p>
-    <iframe [src]="activeYoutubeUrl" width="100%" height="450" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="iframe-preview"></iframe>
+    <div class="mt-3" *ngIf="activeVideoUrl">
+    <p class="text-muted preview-title">Video Preview:</p>
+    <app-video-player [src]="activeVideoUrl"></app-video-player>
   </div>
 
   <div class="mt-4 edit-panel" *ngIf="selectedTmdbVideo">

@@ -1,5 +1,6 @@
 import { Component, ElementRef, Input, OnDestroy, AfterViewInit, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import videojs from 'video.js';
+import 'videojs-youtube';
 
 @Component({
   selector: 'app-video-player',
@@ -25,7 +26,10 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
   ngOnChanges(changes: SimpleChanges) {
     if (changes['src'] && !changes['src'].isFirstChange()) {
       if (this.player) {
-        this.player.src({ src: this.src, type: this.type });
+        const isYoutube = this.isYoutubeUrl(this.src);
+        const videoType = isYoutube ? 'video/youtube' : this.type;
+        
+        this.player.src({ src: this.src, type: videoType });
         this.player.load();
         this.player.play(); 
       }
@@ -34,17 +38,31 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
 
   initPlayer() {
     if (this.target && this.target.nativeElement) {
-      this.player = videojs(this.target.nativeElement, {
+      const isYoutube = this.isYoutubeUrl(this.src);
+      const videoType = isYoutube ? 'video/youtube' : this.type;
+      
+      const playerOptions: any = {
         controls: true,
         autoplay: true, 
         preload: 'auto',
         fluid: true, 
         sources: [{
           src: this.src,
-          type: this.type
+          type: videoType
         }]
-      });
+      };
+
+      if (isYoutube) {
+        playerOptions.techOrder = ['youtube'];
+      }
+
+      this.player = videojs(this.target.nativeElement, playerOptions);
     }
+  }
+
+  private isYoutubeUrl(url: string): boolean {
+    if (!url) return false;
+    return url.includes('youtube.com') || url.includes('youtu.be');
   }
 
   ngOnDestroy() {
