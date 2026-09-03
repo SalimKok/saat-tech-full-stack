@@ -2,18 +2,18 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth-service';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule], 
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
 export class LoginComponent {
   credentials = { username: '', password: '' };
-  
+
   errorMessage = '';
   isLoading = false;
 

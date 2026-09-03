@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 export class ContentDetailService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/api/client/contents`;
-  
+
   getContentById(id: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${id}`);
   }

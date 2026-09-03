@@ -3,18 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth-service';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './register.html',
-  styleUrl: '../login/login.css' 
+  styleUrl: '../login/login.css'
 })
 export class RegisterComponent {
   userData = { username: '', password: ''};
-  
+
   errorMessage = '';
   successMessage = '';
   isLoading = false;
@@ -29,7 +29,7 @@ export class RegisterComponent {
     this.authService.register(this.userData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        
+
         if (response && response.role) {
           this.successMessage = 'Registration successful! Redirecting to application...';
           setTimeout(() => {
