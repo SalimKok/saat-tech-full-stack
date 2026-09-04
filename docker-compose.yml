@@ -94,7 +94,7 @@ services:
       - auth-service
       - core-service
     environment:
-      - EUREKA_URL=http://discovery-server:8761/eureka/,
+      - EUREKA_URL=http://discovery-server:8761/eureka/
       - GATEWAY_SECRET=${GATEWAY_SECRET}
       - CORS_ORIGINS=${CORS_ORIGINS}
     ports:

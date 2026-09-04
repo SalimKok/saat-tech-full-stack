@@ -19,7 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "contents")
+@Document(indexName = "contents", createIndex = false)
 public class ContentIndex {
 
     @Id
