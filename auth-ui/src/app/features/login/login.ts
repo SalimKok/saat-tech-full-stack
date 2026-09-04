@@ -30,7 +30,7 @@ export class LoginComponent {
           const role = response.role;
 
           if (role === 'ADMIN') {
-            window.location.href = `${environment.apiUrl}/auth-callback`;
+            window.location.href = `${environment.apiUrl}/admin/auth-callback`;
           } else {
             window.location.href = `${environment.streamClientUrl}/auth-callback`;
           }
