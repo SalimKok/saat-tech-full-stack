@@ -48,7 +48,7 @@ public class ApiGatewayApplication {
 		String gatewaySecret = gatewayProperties.getSecret();
 
 		return GatewayRouterFunctions.route("core-service")
-				.route(GatewayRequestPredicates.path("/api/contents/**", "/api/casts/**", "/api/licenses/**", "/api/contentSearch/**", "/uploads/**", "/api/contents-trailer/**", "/api/client/contents/**"), http())
+				.route(GatewayRequestPredicates.path("/api/contents/**", "/api/casts/**", "/api/licenses/**", "/api/contentSearch/**", "/uploads/**", "/api/contents-trailer/**", "/api/client/contents/**", "/api/omdb/**"), http())
 				.filter(lb("core-service"))
 				.before(BeforeFilterFunctions.addRequestHeader("X-Gateway-Secret", gatewaySecret))
 				.build()
