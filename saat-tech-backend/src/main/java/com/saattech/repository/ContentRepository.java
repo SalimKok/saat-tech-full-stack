@@ -13,8 +13,6 @@ public interface ContentRepository extends JpaRepository<Content, Long>, JpaSpec
 
     Optional<Content> findByMetadata_ImdbID(String imdbID);
 
-    Optional<Content> findByIdAndStatus(Long id, ContentStatus status);
-
     Optional<Content> findByIdAndStatusNot(Long id, ContentStatus status);
 
     Optional<Content> findByParentContent_IdAndContentTypeAndSeasonNo(Long parentId, ContentType contentType, Integer seasonNo);

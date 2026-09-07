@@ -5,7 +5,6 @@
         <div style="display: flex; align-items: center; gap: 15px;">
           <h3 style="margin: 0;">Edit Content</h3>
           
-          <!-- Dropdown ile Durum Seçimi -->
           <select [ngModel]="editingMovie.status" 
                   (ngModelChange)="onStatusChange($event)"
                   [disabled]="editLoading"
@@ -15,7 +14,7 @@
             <option value="NO_ACTIVE_LICENSE">NO_ACTIVE_LICENSE</option>
           </select>
           
-          <span *ngIf="editLoading" style="font-size: 12px; color: #4dabf7; font-weight: bold;">Güncelleniyor...</span>
+          <span *ngIf="editLoading" style="font-size: 12px; color: #4dabf7; font-weight: bold;">Updating...</span>
         </div>
         <button class="close-btn" (click)="close()" [disabled]="editLoading">&times;</button>
       </div>

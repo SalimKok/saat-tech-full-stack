@@ -35,27 +35,27 @@
         </div>
 
         <div *ngIf="inputType === 'UPLOAD'" class="upload-section">
-          <div 
-            class="upload-area glass-input" 
-            [class.has-image]="imagePreview"
-            (dragover)="onDragOver($event)" 
-            (drop)="onDrop($event)"
-          >
-            <input type="file" (change)="onFileSelected($event)" class="file-input-hidden" #fileInput accept="image/*">
-            
-            <div *ngIf="!imagePreview" class="upload-placeholder">
-              <span class="upload-icon">📥</span>
-              <p>Drag and drop an image here</p>
-              <p class="or-text">- or -</p>
-              <button type="button" class="btn-browse" (click)="fileInput.click()">Browse Files</button>
-            </div>
-            <div *ngIf="imagePreview" class="image-preview" (click)="fileInput.click()" style="cursor: pointer;" title="Click to change image">
-              <img [src]="imagePreview" alt="Preview" />
-              <button type="button" class="btn-remove" (click)="removeImage(); $event.stopPropagation()" title="Remove Image">✖</button>
+          <div class="upload-area glass-input flex">
+    
+            <input 
+                type="file" 
+                id="posterUpload" 
+                accept="image/*" 
+                class="file-input-hidden" 
+                (change)="onFileSelected($event)">
+                
+            <div class="upload-placeholder flex">
+                <span class="upload-icon">...</span>
+                <p>Drag and drop an image here</p>
+                <p class="or-text">- or -</p>
+                
+                <label for="posterUpload" class="btn-browse" style="cursor: pointer; display: inline-block; text-align: center;">
+                    Browse Files
+                </label>
+                
             </div>
           </div>
         </div>
-
 
         <div *ngIf="inputType === 'URL'" class="url-section">
           <input 

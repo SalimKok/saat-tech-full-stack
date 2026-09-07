@@ -30,7 +30,6 @@ public class ContentSpecificationBuilder {
                 predicates.add(criteriaBuilder.equal(root.get("contentType"), filter.getContentType()));
             }
 
-
             if (filter.getGenre() != null && !filter.getGenre().trim().isEmpty()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.join("metadata").get("genre")),

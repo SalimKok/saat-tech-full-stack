@@ -58,8 +58,6 @@ public class Content {
     private List<License> licenses;
 
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@ToString.Exclude
-    //@EqualsAndHashCode.Exclude
     private List<Trailer> trailers;
 
 }
