@@ -35,7 +35,7 @@
         </div>
 
         <div *ngIf="inputType === 'UPLOAD'" class="upload-section">
-          <div class="upload-area glass-input flex">
+           <div class="upload-area glass-input flex" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
     
             <input 
                 type="file" 
